@@ -248,7 +248,7 @@ namespace kcmh
       alpidePixelSizeX
     );
     new G4PVReplica(
-      "alpidePixelPhys",
+      "alpidePhys",
       alpidePixelRowLog,
       alpideLog,
       kYAxis,
@@ -328,7 +328,7 @@ namespace kcmh
       checkOverlaps
     );
 
-    installPhantom(true);
+    // installPhantom(true);
 
     return new G4PVPlacement(
       nullptr,

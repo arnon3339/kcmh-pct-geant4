@@ -37,21 +37,32 @@ namespace kcmh
     if (edep == 0.) return true;
 
     G4String volumeName = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume(3)->GetName();
-    // G4cout << "XXXXXXXXXXXXXXXXXX" << G4endl;
     if (volumeName.compare("trackerFlexPhys"))
+    {
       newHit->SetLayerID(step->GetPreStepPoint()->
         GetTouchableHandle()->GetReplicaNumber(6) + 1);
+      newHit->SetPixels(
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(4)*1024 +
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(1),
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(5)*512 +
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(2)
+      );
+    }
     else
+    {
       newHit->SetLayerID(0);
-    newHit->SetPixels(
-        step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(1),
-        step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(2)
-    );
-    // G4cout << newHit->GetLayerID() << G4endl;
+      newHit->SetPixels(
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(3)*1024 +
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(1),
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(4)*512 +
+          step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(2)
+      );
+
+    }
+
     newHit->SetEdep(edep);
     newHit->SetTrackID(step->GetTrack()->GetTrackID());
     fHitsCollection->insert(newHit);
-    // G4cout << "XXXXXXXXXXXXXXXXXX" << G4endl;
 
     return true;
   }

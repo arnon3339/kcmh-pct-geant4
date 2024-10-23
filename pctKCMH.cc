@@ -16,6 +16,7 @@ int main(int argc, char **argv)
 
   auto runManager = 
     G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  runManager->SetNumberOfThreads(1);
 
   runManager->SetUserInitialization(new QBBC());
   runManager->SetUserInitialization(new ActionInitialization());

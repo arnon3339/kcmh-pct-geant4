@@ -22,6 +22,7 @@ set(SCRIPTS
     beam_collimated.mac
     beam_kcmh.mac
     beam_paralell.mac
+    run_noph.mac
 )
 
 foreach(_script ${SCRIPTS})
