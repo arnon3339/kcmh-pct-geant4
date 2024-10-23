@@ -6,6 +6,7 @@
 #include "ActionInitialization.hh"
 #include "QBBC.hh"
 #include "DetectorConstruction.hh"
+#include "PrimaryGeneratorAction.hh"
 
 using namespace kcmh;
 

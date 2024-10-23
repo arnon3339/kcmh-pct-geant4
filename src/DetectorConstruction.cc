@@ -30,6 +30,8 @@ namespace kcmh
     G4bool checkOverlaps = true;
     auto nist = G4NistManager::Instance();
     auto airMat = nist->FindOrBuildMaterial("G4_AIR");
+    auto siliconMat = nist->FindOrBuildMaterial("G4_Si");
+    auto aluminiumMat = nist->FindOrBuildMaterial("G4_Al");
     auto nonVis = new G4VisAttributes();
     nonVis->SetVisibility(false);
 
@@ -39,6 +41,8 @@ namespace kcmh
     G4double alpideSizeX = 3. *cm;
     G4double alpideSizeY = 1.38 *cm;
     G4double alpideSizeZ = 50. *um;
+    G4double alpideCircuitSizeZ = 11. *um;
+    G4double alpideEpiSizeZ = 25. *um;
     G4double absorberSizeZ = 3.5 *mm;
     G4double absorberSizeX = alpideSizeX;
     G4double absorberSizeY = alpideSizeY;
@@ -63,6 +67,12 @@ namespace kcmh
     );
     auto alpideInDtcPos = G4ThreeVector(
       0, 0, (-dtcLayerDis/2) + alpideSizeZ/2
+    );
+    auto alpideCircuitInAlpidePos = G4ThreeVector(
+      0, 0, (-alpideSizeZ/2) + alpideCircuitSizeZ/2
+    );
+    auto alpideEpiInAlpidePos = G4ThreeVector(
+      0, 0, (-alpideSizeZ/2) + alpideCircuitSizeZ + alpideEpiSizeZ/2
     );
 
     auto worldSol = new G4Box(
@@ -95,6 +105,12 @@ namespace kcmh
     auto trackerFlexSol = new G4Box(
       "trackerFlexSol", detSizeX/2, alpideSizeY/2, alpideSizeZ/2
     );
+    auto alpideCircuitSol = new G4Box(
+      "alpideCircuitSol", alpideSizeX/2, alpideSizeY/2, alpideCircuitSizeZ/2
+    );
+    auto alpideEpiSol = new G4Box(
+      "alpideEpiSol", alpideSizeX/2, alpideSizeY/2, alpideEpiSizeZ/2
+    );
 
     auto worldLog = new G4LogicalVolume(
       worldSol, airMat, "worldLog"
@@ -123,11 +139,19 @@ namespace kcmh
     );
     dtcLayerLog->SetVisAttributes(nonVis);
     auto alpideLog = new G4LogicalVolume(
-      alpdieSol, airMat, "alpideLog"
+      alpdieSol, siliconMat, "alpideLog"
     );
     auto alpideVis = new G4VisAttributes();
     alpideVis->SetColor(1, 0, 0, 1);
     alpideLog->SetVisAttributes(alpideVis);
+    auto alpideCircuitLog = new G4LogicalVolume(
+      alpideCircuitSol, aluminiumMat, "alideCircuitLog"
+    );
+    alpideCircuitLog->SetVisAttributes(nonVis);
+    auto alpideEpiLog = new G4LogicalVolume(
+      alpideEpiSol, siliconMat, "alpideEpiLog"
+    );
+    alpideEpiLog->SetVisAttributes(nonVis);
     auto absorberLog = new G4LogicalVolume(
       absorberSol, airMat, "absorberLog"
     );
@@ -160,6 +184,26 @@ namespace kcmh
       absorberLog,
       "absorberPixelPhys",
       dtcPixelLog,
+      false,
+      0,
+      checkOverlaps
+    );
+    new G4PVPlacement(
+      nullptr,
+      alpideCircuitInAlpidePos,
+      alpideCircuitLog,
+      "alpideCircuitPhys",
+      alpideLog,
+      false,
+      0,
+      checkOverlaps
+    );
+    new G4PVPlacement(
+      nullptr,
+      alpideEpiInAlpidePos,
+      alpideEpiLog,
+      "alpideEpiPhys",
+      alpideLog,
       false,
       0,
       checkOverlaps
