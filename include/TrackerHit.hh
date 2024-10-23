@@ -26,13 +26,13 @@ class TrackerHit : public G4VHit
     void SetTrackID  (G4int track)      { fTrackID = track; };
     void SetLayerID  (G4int layerID)      { fLayerID = layerID; };
     void SetEdep     (G4double de)      { fEdep = de; };
-    void SetPos      (G4int*);
+    void SetPixels      (G4int, G4int);
 
     // Get methods
     G4int GetTrackID() const     { return fTrackID; };
     G4int GetLayerID() const   { return fLayerID; };
     G4double GetEdep() const     { return fEdep; };
-    G4int* GetPos() { return fPixels; };
+    G4int* GetPixels() { return fPixels; };
 
   private:
     G4int         fTrackID = -1;

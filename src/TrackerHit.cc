@@ -28,10 +28,10 @@ G4bool TrackerHit::operator==(const TrackerHit& right) const
   return ( this == &right ) ? true : false;
 }
 
-void TrackerHit::SetPos(G4int* xy)
+void TrackerHit::SetPixels(G4int x, G4int y)
 {
-  fPixels[0] = xy[0];
-  fPixels[1] = xy[1];
+  fPixels[0] = x;
+  fPixels[1] = y;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

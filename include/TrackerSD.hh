@@ -2,8 +2,7 @@
 #define TRACKERSD_HH 1
 
 #include "G4VSensitiveDetector.hh"
-
-class TrackerHitsCollection;
+#include "TrackerHit.hh"
 
 namespace kcmh
 {

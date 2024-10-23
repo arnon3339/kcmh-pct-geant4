@@ -1,5 +1,6 @@
 #include "DetectorConstruction.hh"
 
+#include "TrackerSD.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
@@ -11,6 +12,7 @@
 #include "G4VPhysicalVolume.hh"
 #include "phantomConstruction.hh"
 #include "DetectorMessager.hh"
+#include "G4SDManager.hh"
 
 namespace kcmh
 {
@@ -38,11 +40,15 @@ namespace kcmh
     G4int numAlpideCol = 9;
     G4int numAlpideRow = 12;
     G4int numOfDtcLayer = 42;
+    G4int numOfPixelRow = 1024;
+    G4int numOfPixelCol = 512;
     G4double alpideSizeX = 3. *cm;
     G4double alpideSizeY = 1.38 *cm;
+    G4double alpidePixelSizeX = alpideSizeX/numOfPixelRow;
+    G4double alpidePixelSizeY = alpideSizeY/numOfPixelCol;
     G4double alpideSizeZ = 50. *um;
-    G4double alpideCircuitSizeZ = 11. *um;
-    G4double alpideEpiSizeZ = 25. *um;
+    G4double alpidePixelCircuitSizeZ = 11. *um;
+    G4double alpidePixelEpiSizeZ = 25. *um;
     G4double absorberSizeZ = 3.5 *mm;
     G4double absorberSizeX = alpideSizeX;
     G4double absorberSizeY = alpideSizeY;
@@ -68,11 +74,11 @@ namespace kcmh
     auto alpideInDtcPos = G4ThreeVector(
       0, 0, (-dtcLayerDis/2) + alpideSizeZ/2
     );
-    auto alpideCircuitInAlpidePos = G4ThreeVector(
-      0, 0, (-alpideSizeZ/2) + alpideCircuitSizeZ/2
+    auto alpidePixelCircuitInAlpidePos = G4ThreeVector(
+      0, 0, (-alpideSizeZ/2) + alpidePixelCircuitSizeZ/2
     );
-    auto alpideEpiInAlpidePos = G4ThreeVector(
-      0, 0, (-alpideSizeZ/2) + alpideCircuitSizeZ + alpideEpiSizeZ/2
+    auto alpidePixelEpiInAlpidePos = G4ThreeVector(
+      0, 0, (-alpideSizeZ/2) + alpidePixelCircuitSizeZ + alpidePixelEpiSizeZ/2
     );
 
     auto worldSol = new G4Box(
@@ -81,14 +87,14 @@ namespace kcmh
     auto envSol = new G4Box(
       "envSol", envSizeXY/2, envSizeXY/2, envSizeZ/2
     );
-    auto dtcPixelSol = new G4Box(
-      "dtcPixelSol", alpideSizeX/2, alpideSizeY/2, dtcLayerDis/2
+    auto dtcChipSol = new G4Box(
+      "dtcChipSol", alpideSizeX/2, alpideSizeY/2, dtcLayerDis/2
     );
-    auto dtcPixelXSol = new G4Box(
-      "dtcPixelXSol", detSizeX/2, alpideSizeY/2, dtcLayerDis/2
+    auto dtcChipXSol = new G4Box(
+      "dtcChipXSol", detSizeX/2, alpideSizeY/2, dtcLayerDis/2
     );
-    auto dtcPixelYSol = new G4Box(
-      "dtcPixelYSol", detSizeX/2, detSizeY/2, dtcLayerDis/2
+    auto dtcChipYSol = new G4Box(
+      "dtcChipYSol", detSizeX/2, detSizeY/2, dtcLayerDis/2
     );
     auto dtcLayerSol = new G4Box(
       "dtcLayerSol", detSizeX/2, detSizeY/2, dtcSizeZ/2
@@ -105,11 +111,17 @@ namespace kcmh
     auto trackerFlexSol = new G4Box(
       "trackerFlexSol", detSizeX/2, alpideSizeY/2, alpideSizeZ/2
     );
-    auto alpideCircuitSol = new G4Box(
-      "alpideCircuitSol", alpideSizeX/2, alpideSizeY/2, alpideCircuitSizeZ/2
+    auto alpidePixelCircuitSol = new G4Box(
+      "alpidePixelCircuitSol", alpidePixelSizeX/2, alpidePixelSizeY/2, alpidePixelCircuitSizeZ/2
     );
-    auto alpideEpiSol = new G4Box(
-      "alpideEpiSol", alpideSizeX/2, alpideSizeY/2, alpideEpiSizeZ/2
+    auto alpidePixelEpiSol = new G4Box(
+      "alpidePixelEpiSol", alpidePixelSizeX/2, alpidePixelSizeY/2, alpidePixelEpiSizeZ/2
+    );
+    auto alpidePixelSol = new G4Box(
+      "alpidePixelSol", alpidePixelSizeX/2, alpidePixelSizeY/2, alpideSizeZ/2
+    );
+    auto alpidePixelRowSol = new G4Box(
+      "alpidePixelRowSol", alpideSizeX/2, alpidePixelSizeY/2, alpideSizeZ/2
     );
 
     auto worldLog = new G4LogicalVolume(
@@ -122,18 +134,18 @@ namespace kcmh
     auto envVis = new G4VisAttributes();
     envVis->SetForceWireframe(true);
     envLog->SetVisAttributes(envVis);
-    auto dtcPixelLog = new G4LogicalVolume(
-      dtcPixelSol, airMat, "dtcPixelSol"
+    auto dtcChipLog = new G4LogicalVolume(
+      dtcChipSol, airMat, "dtcChipSol"
     );
-    dtcPixelLog->SetVisAttributes(nonVis);
-    auto dtcPixelXLog = new G4LogicalVolume(
-      dtcPixelXSol, airMat, "dtcPixelXLog"
+    dtcChipLog->SetVisAttributes(nonVis);
+    auto dtcChipXLog = new G4LogicalVolume(
+      dtcChipXSol, airMat, "dtcChipXLog"
     );
-    dtcPixelXLog->SetVisAttributes(nonVis);
-    auto dtcPixelYLog = new G4LogicalVolume(
-      dtcPixelYSol, airMat, "dtcPixelYLog"
+    dtcChipXLog->SetVisAttributes(nonVis);
+    auto dtcChipYLog = new G4LogicalVolume(
+      dtcChipYSol, airMat, "dtcChipYLog"
     );
-    dtcPixelYLog->SetVisAttributes(nonVis);
+    dtcChipYLog->SetVisAttributes(nonVis);
     auto dtcLayerLog = new G4LogicalVolume(
       dtcLayerSol, airMat, "dtcLayerLog"
     );
@@ -144,16 +156,22 @@ namespace kcmh
     auto alpideVis = new G4VisAttributes();
     alpideVis->SetColor(1, 0, 0, 1);
     alpideLog->SetVisAttributes(alpideVis);
-    auto alpideCircuitLog = new G4LogicalVolume(
-      alpideCircuitSol, aluminiumMat, "alideCircuitLog"
+    auto alpidePixelCircuitLog = new G4LogicalVolume(
+      alpidePixelCircuitSol, aluminiumMat, "alideCircuitLog"
     );
-    alpideCircuitLog->SetVisAttributes(nonVis);
-    auto alpideEpiLog = new G4LogicalVolume(
-      alpideEpiSol, siliconMat, "alpideEpiLog"
+    alpidePixelCircuitLog->SetVisAttributes(nonVis);
+    auto alpidePixelEpiLog = new G4LogicalVolume(
+      alpidePixelEpiSol, siliconMat, "alpidePixelEpiLog"
     );
-    alpideEpiLog->SetVisAttributes(nonVis);
+    alpidePixelEpiLog->SetVisAttributes(nonVis);
     auto absorberLog = new G4LogicalVolume(
       absorberSol, airMat, "absorberLog"
+    );
+    auto alpidePixelLog = new G4LogicalVolume(
+      alpidePixelSol, siliconMat, "alpidePixelLog"
+    );
+    auto alpidePixelRowLog = new G4LogicalVolume(
+      alpidePixelRowSol, siliconMat, "alpidePixelRowLog"
     );
     auto trackerLog = new G4LogicalVolume(
       trackerSol, airMat, "trackerLog"
@@ -183,27 +201,27 @@ namespace kcmh
       absorberInDtcPos,
       absorberLog,
       "absorberPixelPhys",
-      dtcPixelLog,
+      dtcChipLog,
       false,
       0,
       checkOverlaps
     );
     new G4PVPlacement(
       nullptr,
-      alpideCircuitInAlpidePos,
-      alpideCircuitLog,
-      "alpideCircuitPhys",
-      alpideLog,
+      alpidePixelCircuitInAlpidePos,
+      alpidePixelCircuitLog,
+      "alpidePixelCircuitPhys",
+      alpidePixelLog,
       false,
       0,
       checkOverlaps
     );
     new G4PVPlacement(
       nullptr,
-      alpideEpiInAlpidePos,
-      alpideEpiLog,
-      "alpideEpiPhys",
-      alpideLog,
+      alpidePixelEpiInAlpidePos,
+      alpidePixelEpiLog,
+      "alpidePixelEpiPhys",
+      alpidePixelLog,
       false,
       0,
       checkOverlaps
@@ -213,30 +231,47 @@ namespace kcmh
       alpideInDtcPos,
       alpideLog,
       "absorberPixelPhys",
-      dtcPixelLog,
+      dtcChipLog,
       false,
       0,
       checkOverlaps
     );
+
+    new G4PVReplica(
+      "alpidePixelRowPhys",
+      alpidePixelLog,
+      alpidePixelRowLog,
+      kXAxis,
+      numOfPixelRow,
+      alpidePixelSizeX
+    );
+    new G4PVReplica(
+      "alpidePixelPhys",
+      alpidePixelRowLog,
+      alpideLog,
+      kYAxis,
+      numOfPixelCol,
+      alpidePixelSizeY
+    );
     new G4PVReplica(
       "dtcXPhys",
-      dtcPixelLog,
-      dtcPixelXLog,
+      dtcChipLog,
+      dtcChipXLog,
       kXAxis,
       numAlpideCol,
       alpideSizeX 
     );
     new G4PVReplica(
       "dtcYPhys",
-      dtcPixelXLog,
-      dtcPixelYLog,
+      dtcChipXLog,
+      dtcChipYLog,
       kYAxis,
       numAlpideRow,
       alpideSizeY
     );
     new G4PVReplica(
       "dtcLayerPhys",
-      dtcPixelYLog,
+      dtcChipYLog,
       dtcLayerLog,
       kZAxis,
       numOfDtcLayer,
@@ -273,7 +308,7 @@ namespace kcmh
       nullptr,
       dtcPos,
       dtcLayerLog,
-      "dtcPixelYPhys",
+      "dtcChipYPhys",
       envLog,
       false,
       0,
@@ -303,7 +338,14 @@ namespace kcmh
     );
   }
 
-  void DetectorConstruction::ConstructSDandField(){}
+  void DetectorConstruction::ConstructSDandField()
+  {
+    G4String dtcSDName = "/DTC";
+    auto dtcSD = new TrackerSD(dtcSDName, "dtcHitsCollection");
+    G4SDManager::GetSDMpointer()->AddNewDetector(dtcSD);    
+    SetSensitiveDetector("alpidePixelEpiLog", dtcSD, true);
+  }
+
   void DetectorConstruction::RotatePhantom(G4double)
   {}
 } // namespace kcmh

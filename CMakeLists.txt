@@ -19,6 +19,9 @@ set(SCRIPTS
     run.mac
     vis.mac
     init_vis.mac
+    beam_collimated.mac
+    beam_kcmh.mac
+    beam_paralell.mac
 )
 
 foreach(_script ${SCRIPTS})

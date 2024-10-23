@@ -1,1 +1,3 @@
 /run/initialize
+/control/execute beam_paralell.mac
+/run/beamOn 10
