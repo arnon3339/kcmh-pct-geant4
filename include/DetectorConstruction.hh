@@ -23,12 +23,13 @@ namespace kcmh
       G4double GetPHangle() {return phAngle;};
       G4int GetPhIndex() {return ph->GetPhIndex();};
       G4String GetPhName() {return ph->GetPhName();};
+      void installPhantom(G4bool);
 
     private:
       DetectorMessager* detMessager;
       G4LogicalVolume* phanLog;
       G4double phAngle;
-      G4LogicalVolume* worldLog;
+      G4LogicalVolume* envLog;
       G4VPhysicalVolume* phPhys;
       PhantomConstruction* ph;
   };

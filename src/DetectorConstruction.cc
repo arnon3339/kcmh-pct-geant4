@@ -13,11 +13,13 @@
 #include "phantomConstruction.hh"
 #include "DetectorMessager.hh"
 #include "G4SDManager.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4RunManager.hh"
 
 namespace kcmh
 {
   DetectorConstruction::DetectorConstruction(G4String phName)
-  :detMessager(0), phanLog(0), phAngle(0), worldLog(0), phPhys(0), ph(0)
+  :detMessager(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
   {
     ph = new PhantomConstruction(phName);
     phanLog = ph->GetLogVolume();
@@ -128,7 +130,7 @@ namespace kcmh
       worldSol, airMat, "worldLog"
     );
     worldLog->SetVisAttributes(nonVis);
-    auto envLog = new G4LogicalVolume(
+    envLog = new G4LogicalVolume(
       envSol, airMat, "envLog"
     );
     auto envVis = new G4VisAttributes();
@@ -326,6 +328,8 @@ namespace kcmh
       checkOverlaps
     );
 
+    installPhantom(true);
+
     return new G4PVPlacement(
       nullptr,
       G4ThreeVector(),
@@ -348,4 +352,40 @@ namespace kcmh
 
   void DetectorConstruction::RotatePhantom(G4double)
   {}
+
+  void DetectorConstruction::installPhantom(G4bool install)
+  {
+    G4bool checkOverlaps = true;
+    if (phPhys)
+    {
+      if (!install)
+      {
+        G4LogicalVolume* logicalVolume = phPhys->GetLogicalVolume();
+        logicalVolume->ClearDaughters();
+        delete phPhys;
+        phPhys = nullptr;
+        G4RunManager::GetRunManager()->GeometryHasBeenModified();
+      }
+    }
+    else
+    {
+      if (install)
+      {
+        phAngle = 90 *deg;
+        auto rMatrix = new G4RotationMatrix();;
+        rMatrix->rotateY(phAngle);
+        phPhys = new G4PVPlacement(
+          rMatrix,
+          G4ThreeVector(0, 0, 0),
+          phanLog,
+          "phantomPhys",
+          envLog,
+          false,
+          0,
+          checkOverlaps
+        );
+        G4RunManager::GetRunManager()->GeometryHasBeenModified();
+      }
+    }
+  }
 } // namespace kcmh

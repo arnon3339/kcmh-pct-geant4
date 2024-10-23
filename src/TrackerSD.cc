@@ -37,7 +37,7 @@ namespace kcmh
     if (edep == 0.) return true;
 
     G4String volumeName = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume(3)->GetName();
-    G4cout << "XXXXXXXXXXXXXXXXXX" << G4endl;
+    // G4cout << "XXXXXXXXXXXXXXXXXX" << G4endl;
     if (volumeName.compare("trackerFlexPhys"))
       newHit->SetLayerID(step->GetPreStepPoint()->
         GetTouchableHandle()->GetReplicaNumber(6) + 1);
@@ -47,11 +47,11 @@ namespace kcmh
         step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(1),
         step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(2)
     );
-    G4cout << newHit->GetLayerID() << G4endl;
+    // G4cout << newHit->GetLayerID() << G4endl;
     newHit->SetEdep(edep);
     newHit->SetTrackID(step->GetTrack()->GetTrackID());
     fHitsCollection->insert(newHit);
-    G4cout << "XXXXXXXXXXXXXXXXXX" << G4endl;
+    // G4cout << "XXXXXXXXXXXXXXXXXX" << G4endl;
 
     return true;
   }

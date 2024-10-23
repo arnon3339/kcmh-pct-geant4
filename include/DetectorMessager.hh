@@ -4,9 +4,8 @@
 #include "G4UImessenger.hh"
 
 class G4UIdirectory;
-class G4UIcmdWithAString;
-class G4UIcmdWith3VectorAndUnit;
 class G4UIcmdWithADoubleAndUnit;
+class G4UIcmdWithABool;
 class G4UIcommand;
 
 namespace kcmh
@@ -16,9 +15,11 @@ namespace kcmh
     {
     private:
       DetectorConstruction* fdet;
-      G4UIdirectory*             fDirectory;
-      G4UIdirectory*             fSubDirectory;
-      G4UIcmdWithADoubleAndUnit*        fSetAngleCmd;
+      G4UIdirectory*              fDirectory;
+      G4UIdirectory*              fPhDirectory;
+      G4UIdirectory*              fRotPhDirectory;
+      G4UIcmdWithADoubleAndUnit*  fSetPhAngleCmd;
+      G4UIcmdWithABool*           fSetPhInstallCmd;
 
     public:
       DetectorMessager(DetectorConstruction*);
