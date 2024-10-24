@@ -4,8 +4,8 @@
 #include "G4VisManager.hh"
 #include "G4VisExecutive.hh"
 #include "ActionInitialization.hh"
-#include "QBBC.hh"
 #include "DetectorConstruction.hh"
+#include "PhysicsList.hh"
 
 using namespace kcmh;
 
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
   runManager->SetNumberOfThreads(1);
 
-  runManager->SetUserInitialization(new QBBC());
+  runManager->SetUserInitialization(new PhysicsList());
   runManager->SetUserInitialization(new ActionInitialization());
   runManager->SetUserInitialization(new DetectorConstruction("catphan404"));
 

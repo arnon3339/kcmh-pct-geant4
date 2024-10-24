@@ -5,6 +5,7 @@
 #include "G4Step.hh"
 #include "G4TouchableHistory.hh"
 #include "G4Track.hh"
+#include "G4SystemOfUnits.hh"
 
 #include <cmath>
 
@@ -34,7 +35,7 @@ namespace kcmh
     G4Track* track = step->GetTrack();
     G4double edep = step->GetTotalEnergyDeposit();
     if (track->GetParentID() != 0) return true;
-    if (edep == 0.) return true;
+    if (edep < 3.6 *eV) return true;
 
     G4String volumeName = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume(3)->GetName();
     if (volumeName.compare("trackerFlexPhys"))
@@ -60,7 +61,11 @@ namespace kcmh
 
     }
 
+    // G4cout << newHit->GetLayerID() << G4endl;
+
     newHit->SetEdep(edep);
+    newHit->SetPDGEncoding(track->GetParticleDefinition()->GetAntiPDGEncoding());
+    newHit->SetParentID(track->GetParentID());
     newHit->SetTrackID(step->GetTrack()->GetTrackID());
     fHitsCollection->insert(newHit);
 
