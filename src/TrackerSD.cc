@@ -61,7 +61,6 @@ namespace kcmh
 
     }
 
-    // G4cout << newHit->GetLayerID() << G4endl;
 
     newHit->SetEdep(edep);
     newHit->SetPDGEncoding(track->GetParticleDefinition()->GetAntiPDGEncoding());
@@ -74,13 +73,14 @@ namespace kcmh
 
   void TrackerSD::EndOfEvent(G4HCofThisEvent* hce)
   {
-    if ( verboseLevel>1 ) {
-    G4int nofHits = fHitsCollection->entries();
-    G4cout << G4endl
-          << "-------->Hits Collection: in this event they are " << nofHits
-          << " hits in the tracker chambers: " << G4endl;
-    for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
-  }
-  }
+    if (verboseLevel == 1)
+    {
+      G4int nofHits = fHitsCollection->GetSize();
+      G4cout << G4endl
+            << "-------->Hits Collection: in this event they are " << nofHits
+            << " hits in the tracker chambers: " << G4endl;
+      for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
+      }
+    }
   
 } // namespace kcmh

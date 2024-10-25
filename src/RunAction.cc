@@ -9,8 +9,17 @@ namespace kcmh
 {
   RunAction::RunAction()
   {
+    G4int numAlpideCol = 9;
+    G4int numAlpideRow = 12;
+    G4int numOfDtcLayer = 42;
+    G4int numOfPixelRow = 1024;
+    G4int numOfPixelCol = 512;
+
     auto analysisManager = G4AnalysisManager::Instance(); 
-    analysisManager->CreateH1("Entries", "Number of entries in layers", 43, 0, 43);
+    analysisManager->CreateH1("Entries", "Number of entries in layers", 42, 0, 42);
+    analysisManager->CreateH2("Layer0", "XY Histogram in the Tracker", 
+      numAlpideCol*numOfPixelRow/100, 0, numAlpideCol*numOfPixelRow,
+      numAlpideRow*numOfPixelCol/100, 0, numAlpideRow*numOfPixelCol);
     analysisManager->CreateNtuple("pCT", "pCT Hits");
     analysisManager->CreateNtupleIColumn("eventID");
     analysisManager->CreateNtupleDColumn("pixelX");

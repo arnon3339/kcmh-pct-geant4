@@ -42,8 +42,10 @@ namespace kcmh
     G4int numAlpideCol = 9;
     G4int numAlpideRow = 12;
     G4int numOfDtcLayer = 42;
-    G4int numOfPixelRow = 1024;
-    G4int numOfPixelCol = 512;
+    // G4int numOfPixelRow = 1024;
+    // G4int numOfPixelCol = 512;
+    G4int numOfPixelRow = 2;
+    G4int numOfPixelCol = 2;
     G4double alpideSizeX = 3. *cm;
     G4double alpideSizeY = 1.38 *cm;
     G4double alpidePixelSizeX = alpideSizeX/numOfPixelRow;
@@ -187,16 +189,16 @@ namespace kcmh
     phAngle = 90 *deg;
     auto rMatrix = new G4RotationMatrix();;
     rMatrix->rotateY(phAngle);
-    phPhys = new G4PVPlacement(
-      rMatrix,
-      G4ThreeVector(0, 0, 0),
-      phanLog,
-      "phantomPhys",
-      envLog,
-      false,
-      0,
-      checkOverlaps
-    );
+    // phPhys = new G4PVPlacement(
+    //   rMatrix,
+    //   G4ThreeVector(0, 0, 0),
+    //   phanLog,
+    //   "phantomPhys",
+    //   envLog,
+    //   false,
+    //   0,
+    //   checkOverlaps
+    // );
 
     new G4PVPlacement(
       nullptr,
