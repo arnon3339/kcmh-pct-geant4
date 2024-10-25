@@ -52,13 +52,12 @@ namespace kcmh
     auto outFileName = "projection_" + oss.str() + ".root";
     auto outputDir = "./output/projection_" + oss.str();
     auto outFilePath = outputDir + "/" + outFileName;
-    G4cout << outputDir << G4endl;
     try {
       // Create the directory
       if (std::filesystem::create_directory(outputDir)) {
           std::cout << "Directory created: " << outputDir << std::endl;
       } else {
-          std::cout << "Directory already exists or couldn't be created: " << outputDir << std::endl;
+          // std::cout << "Directory already exists or couldn't be created: " << outputDir << std::endl;
       }
     } 
     catch (const std::filesystem::filesystem_error& e)

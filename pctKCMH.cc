@@ -20,25 +20,33 @@ int main(int argc, char **argv)
 
   program.add_argument("--macro", "-m")
   .help("The macro file")
+  .nargs(1)
   .default_value("init_vis.mac");
 
   program.add_argument("--phantom", "-p")
   .help("The phantom name")
+  .nargs(1)
   .default_value("catphan404");
 
   program.add_argument("--beam", "-b")
   .help("The number of beam")
-  .default_value(1000)
-  .action([](const std::string& value) { return std::stoi(value); });
+  .nargs(1)
+  .default_value("1000");
+
+  program.add_argument("--energy", "-e")
+  .help("The beam energy (MeV)")
+  .nargs(1)
+  .default_value("200");
 
   program.add_argument("-r", "--rotate")
-  .help("Rotation array of a phantom")
-  .nargs('+')
+  .help("Rotation array of a phantom (degree)")
+  .nargs(3)
   .default_value(std::vector<float>{})
   .action([](const std::string& value) { return std::stof(value); });
 
   program.add_argument("--thread", "-t")
   .help("The number of threads")
+  .nargs(1)
   .default_value(1)
   .action([](const std::string& value) { return std::stoi(value); });
 
@@ -47,7 +55,8 @@ int main(int argc, char **argv)
   auto macroFile = program.get("--macro");
   auto phName = program.get("--phantom");
   auto numOfThreads = program.get<int>("--thread");
-  auto numOfBeam = program.get<int>("--beam");
+  auto numOfBeam = program.get("--beam");
+  auto beamEnergy = program.get("--energy");
   auto rotationArray = program.get<std::vector<float>>("--rotate");
   
   const char* outputDir = "./output";
@@ -105,7 +114,9 @@ int main(int argc, char **argv)
     {
       auto rotatePhCmd = "/det/phantom/rotate/angle " + 
         std::to_string(angle) + " deg";
-      auto beamRunCmd = "/run/beamOn " + std::to_string(numOfBeam);
+      auto beamEnergyCmd = "/gps/ene/mono " + beamEnergy + " MeV";
+      auto beamRunCmd = "/run/beamOn " + numOfBeam;
+      UImanager->ApplyCommand(beamEnergyCmd);
       UImanager->ApplyCommand(rotatePhCmd);
       UImanager->ApplyCommand(beamRunCmd);
     }
