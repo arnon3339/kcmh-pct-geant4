@@ -19,11 +19,10 @@ namespace kcmh
       G4VPhysicalVolume* Construct() override;
       void ConstructSDandField() override;
 
-      void RotatePhantom(G4double);
+      void RotatePhantom(const G4double&);
       G4double GetPHangle() {return phAngle;};
       G4int GetPhIndex() {return ph->GetPhIndex();};
       G4String GetPhName() {return ph->GetPhName();};
-      void installPhantom(G4bool);
 
     private:
       DetectorMessager* detMessager;

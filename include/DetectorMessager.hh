@@ -5,7 +5,6 @@
 
 class G4UIdirectory;
 class G4UIcmdWithADoubleAndUnit;
-class G4UIcmdWithABool;
 class G4UIcommand;
 
 namespace kcmh
@@ -19,7 +18,6 @@ namespace kcmh
       G4UIdirectory*              fPhDirectory;
       G4UIdirectory*              fRotPhDirectory;
       G4UIcmdWithADoubleAndUnit*  fSetPhAngleCmd;
-      G4UIcmdWithABool*           fSetPhInstallCmd;
 
     public:
       DetectorMessager(DetectorConstruction*);

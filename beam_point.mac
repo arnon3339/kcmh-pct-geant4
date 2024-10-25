@@ -1,0 +1,5 @@
+/gps/particle proton
+/gps/direction 0 0 1
+/gps/ene/mono 200 MeV
+/gps/pos/centre 0 0 -42.1 cm
+/gps/pos/type Point 

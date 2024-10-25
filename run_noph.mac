@@ -1,4 +1,2 @@
 /run/initialize
-/det/phantom/install false
 /control/execute beam_paralell.mac
-/run/beamOn 10

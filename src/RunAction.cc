@@ -1,9 +1,15 @@
 #include "RunAction.hh"
+#include "DetectorConstruction.hh"
 #include "G4Run.hh"
 #include "G4AnalysisManager.hh"
-#include "TFile.h"
 #include "G4SystemOfUnits.hh"
+#include "G4RunManager.hh"
+
+#include <iostream>
+#include <filesystem>
 #include <string>
+#include <sstream>
+#include <fstream>
 
 namespace kcmh
 {
@@ -16,19 +22,19 @@ namespace kcmh
     G4int numOfPixelCol = 512;
 
     auto analysisManager = G4AnalysisManager::Instance(); 
-    analysisManager->CreateH1("Entries", "Number of entries in layers", 42, 0, 42);
+    analysisManager->CreateH1("Entries", "Number of entries in layers", numOfDtcLayer, 0, numOfDtcLayer);
     analysisManager->CreateH2("Layer0", "XY Histogram in the Tracker", 
       numAlpideCol*numOfPixelRow/100, 0, numAlpideCol*numOfPixelRow,
       numAlpideRow*numOfPixelCol/100, 0, numAlpideRow*numOfPixelCol);
     analysisManager->CreateNtuple("pCT", "pCT Hits");
     analysisManager->CreateNtupleIColumn("eventID");
-    analysisManager->CreateNtupleDColumn("pixelX");
-    analysisManager->CreateNtupleDColumn("pixelY");
-    analysisManager->CreateNtupleDColumn("layerID");
+    analysisManager->CreateNtupleIColumn("pixelX");
+    analysisManager->CreateNtupleIColumn("pixelY");
+    analysisManager->CreateNtupleIColumn("layerID");
     analysisManager->CreateNtupleDColumn("edep");
-    analysisManager->CreateNtupleDColumn("parentID");
-    analysisManager->CreateNtupleDColumn("parentID");
-    analysisManager->CreateNtupleDColumn("trackID");
+    analysisManager->CreateNtupleIColumn("trackID");
+    analysisManager->CreateNtupleIColumn("parentID");
+    analysisManager->CreateNtupleIColumn("PDGe");
     analysisManager->FinishNtuple();
   }
 
@@ -38,7 +44,29 @@ namespace kcmh
   void RunAction::BeginOfRunAction(const G4Run*)
   {
     auto analysisManager = G4AnalysisManager::Instance();
-    analysisManager->OpenFile("./output.root");
+    auto det = (DetectorConstruction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction();
+
+    int angleDegree = (int)(det->GetPHangle()/CLHEP::degree);
+    std::ostringstream oss;
+    oss << std::setw(3) << std::setfill('0') << angleDegree;
+    auto outFileName = "projection_" + oss.str() + ".root";
+    auto outputDir = "./output/projection_" + oss.str();
+    auto outFilePath = outputDir + "/" + outFileName;
+    G4cout << outputDir << G4endl;
+    try {
+      // Create the directory
+      if (std::filesystem::create_directory(outputDir)) {
+          std::cout << "Directory created: " << outputDir << std::endl;
+      } else {
+          std::cout << "Directory already exists or couldn't be created: " << outputDir << std::endl;
+      }
+    } 
+    catch (const std::filesystem::filesystem_error& e)
+    {
+      std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    analysisManager->OpenFile(outFilePath);
   }
 
   void RunAction::EndOfRunAction(const G4Run*)
@@ -46,5 +74,6 @@ namespace kcmh
     auto analysisManager = G4AnalysisManager::Instance();
     analysisManager->Write();  // Write all histograms to file
     analysisManager->CloseFile();  // Close the ROOT file
+
   }
 } // namespace kcmh

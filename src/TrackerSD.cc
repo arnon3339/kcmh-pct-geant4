@@ -60,8 +60,6 @@ namespace kcmh
       );
 
     }
-
-
     newHit->SetEdep(edep);
     newHit->SetPDGEncoding(track->GetParticleDefinition()->GetAntiPDGEncoding());
     newHit->SetParentID(track->GetParentID());

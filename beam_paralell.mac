@@ -2,9 +2,8 @@
 /gps/direction 0 0 1
 /gps/ene/mono 200 MeV
 /gps/pos/centre 0 0 -42.1 cm
-#/gps/pos/type Plane
-#/gps/pos/shape Rectangle
-/gps/pos/type Point 
-#/gps/pos/halfx 3.0*512 cm
-#/gps/pos/halfy 1.38*256 cm
-#/gps/pos/halfz 0 cm 
+/gps/pos/type Plane
+/gps/pos/shape Rectangle
+/gps/pos/halfx 1.5 cm
+/gps/pos/halfy 0.69 cm
+/gps/pos/halfz 0 cm 

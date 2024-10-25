@@ -21,13 +21,22 @@ namespace kcmh
   DetectorConstruction::DetectorConstruction(G4String phName)
   :detMessager(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
   {
-    ph = new PhantomConstruction(phName);
-    phanLog = ph->GetLogVolume();
-    detMessager = new DetectorMessager(this);
+    if (phName.compare("none"))
+    {
+      ph = new PhantomConstruction(phName);
+      phanLog = ph->GetLogVolume();
+      detMessager = new DetectorMessager(this);
+      phAngle = 0. *deg;
+    }
   }
 
   DetectorConstruction::~DetectorConstruction()
-  {}
+  {
+    delete detMessager;
+    delete ph;
+    delete phPhys;
+    delete envLog;
+  }
 
   G4VPhysicalVolume* DetectorConstruction::Construct()
   {
@@ -39,13 +48,16 @@ namespace kcmh
     auto nonVis = new G4VisAttributes();
     nonVis->SetVisibility(false);
 
+    G4double envSizeXY = 30. *cm;
+    G4double envSizeZ = 4. *m;
+
     G4int numAlpideCol = 9;
     G4int numAlpideRow = 12;
     G4int numOfDtcLayer = 42;
-    // G4int numOfPixelRow = 1024;
-    // G4int numOfPixelCol = 512;
-    G4int numOfPixelRow = 2;
-    G4int numOfPixelCol = 2;
+    G4int numOfPixelRow = 1024;
+    G4int numOfPixelCol = 512;
+    // G4int numOfPixelRow = 2;
+    // G4int numOfPixelCol = 2;
     G4double alpideSizeX = 3. *cm;
     G4double alpideSizeY = 1.38 *cm;
     G4double alpidePixelSizeX = alpideSizeX/numOfPixelRow;
@@ -61,8 +73,6 @@ namespace kcmh
     G4double detSizeX = alpideSizeX*numAlpideCol;
     G4double detSizeY = alpideSizeY*numAlpideRow;
     G4double dtcSizeZ = dtcLayerDis*numOfDtcLayer;
-    G4double envSizeXY = 30. *cm;
-    G4double envSizeZ = 2.8 *m;
     G4double phSizeXY = 30. *cm;
     G4double phSizeZ = 30. *cm;
     G4double phToTrackerSizeZ = 2.5 *cm;
@@ -169,7 +179,7 @@ namespace kcmh
     );
     alpidePixelEpiLog->SetVisAttributes(nonVis);
     auto absorberLog = new G4LogicalVolume(
-      absorberSol, airMat, "absorberLog"
+      absorberSol, aluminiumMat, "absorberLog"
     );
     auto alpidePixelLog = new G4LogicalVolume(
       alpidePixelSol, siliconMat, "alpidePixelLog"
@@ -186,19 +196,21 @@ namespace kcmh
     );
     trackerFlexLog->SetVisAttributes(nonVis);
 
-    phAngle = 90 *deg;
-    auto rMatrix = new G4RotationMatrix();;
-    rMatrix->rotateY(phAngle);
-    // phPhys = new G4PVPlacement(
-    //   rMatrix,
-    //   G4ThreeVector(0, 0, 0),
-    //   phanLog,
-    //   "phantomPhys",
-    //   envLog,
-    //   false,
-    //   0,
-    //   checkOverlaps
-    // );
+    if (ph)
+    {
+      G4RotationMatrix* rMatrix = new G4RotationMatrix();
+      rMatrix->rotateY(phAngle);
+      phPhys = new G4PVPlacement(
+        rMatrix,
+        G4ThreeVector(0, 0, 0),
+        phanLog,
+        "phantomPhys",
+        envLog,
+        false,
+        0,
+        checkOverlaps
+      );
+    }
 
     new G4PVPlacement(
       nullptr,
@@ -352,42 +364,16 @@ namespace kcmh
     SetSensitiveDetector("alpidePixelEpiLog", dtcSD, true);
   }
 
-  void DetectorConstruction::RotatePhantom(G4double)
-  {}
-
-  void DetectorConstruction::installPhantom(G4bool install)
+  void DetectorConstruction::RotatePhantom(const G4double& angle)
   {
-    G4bool checkOverlaps = true;
-    if (phPhys)
-    {
-      if (!install)
-      {
-        G4LogicalVolume* logicalVolume = phPhys->GetLogicalVolume();
-        logicalVolume->ClearDaughters();
-        delete phPhys;
-        phPhys = nullptr;
-        G4RunManager::GetRunManager()->GeometryHasBeenModified();
-      }
-    }
-    else
-    {
-      if (install)
-      {
-        phAngle = 90 *deg;
-        auto rMatrix = new G4RotationMatrix();;
-        rMatrix->rotateY(phAngle);
-        phPhys = new G4PVPlacement(
-          rMatrix,
-          G4ThreeVector(0, 0, 0),
-          phanLog,
-          "phantomPhys",
-          envLog,
-          false,
-          0,
-          checkOverlaps
-        );
-        G4RunManager::GetRunManager()->GeometryHasBeenModified();
-      }
-    }
+    phAngle = angle;
+    auto rMatrix = new G4RotationMatrix();
+    rMatrix->rotateY(phAngle);
+
+    phPhys->SetRotation(rMatrix);
+
+    auto runManager = G4RunManager::GetRunManager();
+    runManager->GeometryHasBeenModified();
   }
+
 } // namespace kcmh

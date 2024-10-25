@@ -24,7 +24,7 @@ namespace kcmh
   void EventAction::EndOfEventAction(const G4Event* event)
   {
     auto analysisManager = G4AnalysisManager::Instance();
-    G4cout << "Event: " << event->GetEventID() << G4endl;
+    // G4cout << "Event: " << event->GetEventID() << G4endl;
     if (dtcTrackerID < 0) return;
 
     auto hce = event->GetHCofThisEvent();
@@ -37,7 +37,17 @@ namespace kcmh
       analysisManager->FillH1(0, (*DTC)[i]->GetLayerID());
       if ((*DTC)[i]->GetLayerID() == 0)
         analysisManager->FillH2(0, (*DTC)[i]->GetPixels()[0], 
-          (*DTC)[i]->GetPixels()[0]);
+          (*DTC)[i]->GetPixels()[1]);
+
+      analysisManager->FillNtupleIColumn(0, event->GetEventID());
+      analysisManager->FillNtupleIColumn(1, (*DTC)[i]->GetPixels()[0]);
+      analysisManager->FillNtupleIColumn(2, (*DTC)[i]->GetPixels()[1]);
+      analysisManager->FillNtupleIColumn(3, (*DTC)[i]->GetLayerID());
+      analysisManager->FillNtupleDColumn(4, (*DTC)[i]->GetEdep());
+      analysisManager->FillNtupleIColumn(5, (*DTC)[i]->GetTrackID());
+      analysisManager->FillNtupleIColumn(6, (*DTC)[i]->GetParentID());
+      analysisManager->FillNtupleIColumn(7, (*DTC)[i]->GetPDGEncoding());
+      analysisManager->AddNtupleRow();
     }
   }
 } // namespace kcmh
