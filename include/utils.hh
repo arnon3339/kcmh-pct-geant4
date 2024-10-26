@@ -48,7 +48,7 @@ std::string createOutputDirs(const float& energy, const float& angle)
   }
   else angleDir = ossAngle.str();
 
-  auto outputDir =  "./output/" + energyDir + "/projection_" + angleDir;
+  auto outputDir =  "./output/eMeV_" + energyDir + "/projection_" + angleDir;
   auto outputPath =  outputDir + "/run.root";
 
   try

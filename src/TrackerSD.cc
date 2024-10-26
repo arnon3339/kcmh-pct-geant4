@@ -61,7 +61,7 @@ namespace kcmh
 
     }
     newHit->SetEdep(edep);
-    newHit->SetPDGEncoding(track->GetParticleDefinition()->GetAntiPDGEncoding());
+    newHit->SetPDGEncoding(track->GetParticleDefinition()->GetPDGEncoding());
     newHit->SetParentID(track->GetParentID());
     newHit->SetTrackID(step->GetTrack()->GetTrackID());
     fHitsCollection->insert(newHit);
