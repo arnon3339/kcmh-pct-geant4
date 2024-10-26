@@ -1,9 +1,11 @@
 #include "RunAction.hh"
 #include "DetectorConstruction.hh"
+#include "RunActionMessenger.hh"
 #include "G4Run.hh"
 #include "G4AnalysisManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4RunManager.hh"
+#include "G4String.hh"
 
 #include <iostream>
 #include <filesystem>
@@ -14,6 +16,7 @@
 namespace kcmh
 {
   RunAction::RunAction()
+  : fRunActionMessenger(new RunActionMessenger(this))
   {
     G4int numAlpideCol = 9;
     G4int numAlpideRow = 12;
@@ -39,33 +42,16 @@ namespace kcmh
   }
 
   RunAction::~RunAction()
-  {}
+  {
+    delete fRunActionMessenger;
+  }
 
-  void RunAction::BeginOfRunAction(const G4Run*)
+  void RunAction::BeginOfRunAction(const G4Run*){}
+
+  void RunAction::OpenOutputFile(const G4String& outputFile)
   {
     auto analysisManager = G4AnalysisManager::Instance();
-    auto det = (DetectorConstruction*)G4RunManager::GetRunManager()->GetUserDetectorConstruction();
-
-    int angleDegree = (int)(det->GetPHangle()/CLHEP::degree);
-    std::ostringstream oss;
-    oss << std::setw(3) << std::setfill('0') << angleDegree;
-    auto outFileName = "projection_" + oss.str() + ".root";
-    auto outputDir = "./output/projection_" + oss.str();
-    auto outFilePath = outputDir + "/" + outFileName;
-    try {
-      // Create the directory
-      if (std::filesystem::create_directory(outputDir)) {
-          std::cout << "Directory created: " << outputDir << std::endl;
-      } else {
-          // std::cout << "Directory already exists or couldn't be created: " << outputDir << std::endl;
-      }
-    } 
-    catch (const std::filesystem::filesystem_error& e)
-    {
-      std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-    analysisManager->OpenFile(outFilePath);
+    analysisManager->OpenFile(outputFile);
   }
 
   void RunAction::EndOfRunAction(const G4Run*)
@@ -73,6 +59,5 @@ namespace kcmh
     auto analysisManager = G4AnalysisManager::Instance();
     analysisManager->Write();  // Write all histograms to file
     analysisManager->CloseFile();  // Close the ROOT file
-
   }
 } // namespace kcmh

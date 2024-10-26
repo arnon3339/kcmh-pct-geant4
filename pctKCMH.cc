@@ -7,15 +7,29 @@
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
 #include "argparse.hh"
+#include "utils.hh"
 
 #include <iostream>
-#include <string>
 #include <filesystem>
+#include <string>
+#include <sstream>
+#include <fstream>
 
 using namespace kcmh;
 
 int main(int argc, char **argv)
 {
+
+  try
+  {
+    if (std::filesystem::is_directory("./output"))
+      std::filesystem::remove_all("./output");
+  }
+  catch(const std::filesystem::filesystem_error& e)
+  {
+    exit(EXIT_FAILURE);
+  }
+  
   argparse::ArgumentParser program("pctKCMH"); 
 
   program.add_argument("--macro", "-m")
@@ -35,8 +49,9 @@ int main(int argc, char **argv)
 
   program.add_argument("--energy", "-e")
   .help("The beam energy (MeV)")
-  .nargs(1)
-  .default_value("200");
+  .nargs(3)
+  .default_value(std::vector<float>{})
+  .action([](const std::string& value) { return std::stof(value); });
 
   program.add_argument("-r", "--rotate")
   .help("Rotation array of a phantom (degree)")
@@ -56,23 +71,8 @@ int main(int argc, char **argv)
   auto phName = program.get("--phantom");
   auto numOfThreads = program.get<int>("--thread");
   auto numOfBeam = program.get("--beam");
-  auto beamEnergy = program.get("--energy");
+  auto beamEnergyArray = program.get<std::vector<float>>("--energy");
   auto rotationArray = program.get<std::vector<float>>("--rotate");
-  
-  const char* outputDir = "./output";
-  try {
-    // Create the directory
-    if (std::filesystem::create_directory(outputDir)) {
-        std::cout << "Directory created: " << outputDir << std::endl;
-    } else {
-      std::filesystem::remove_all(outputDir);
-      std::filesystem::create_directory(outputDir);
-    }
-  } 
-  catch (const std::filesystem::filesystem_error& e)
-  {
-    std::cerr << "Error: " << e.what() << std::endl;
-  }
 
   G4UIExecutive* ui = nullptr;
   if (argc == 1) ui = new G4UIExecutive(argc, argv);
@@ -92,11 +92,18 @@ int main(int argc, char **argv)
   G4String execCommand = "/control/execute ";
   if (!ui && macroFile.compare("init_vis.mac"))
   {
+
+    UImanager->ApplyCommand("/run/initialize");
     UImanager->ApplyCommand(execCommand + macroFile);
     float newRotationArray[] = {0., 0., 1.};
+    float newEnergyArray[] = {200., 200., 1.};
 
     if (rotationArray.size())
-      if (rotationArray.size() < 2) newRotationArray[1] = rotationArray[0];
+      if (rotationArray.size() < 2)
+      {
+        newRotationArray[0] = rotationArray[0];
+        newRotationArray[1] = rotationArray[0];
+      }
       else if (rotationArray.size() < 3)
       {
         newRotationArray[0] = rotationArray[0];
@@ -109,16 +116,41 @@ int main(int argc, char **argv)
         newRotationArray[2] = rotationArray[2];
       }
 
-    for (float angle = newRotationArray[0]; angle <= newRotationArray[1];
-     angle += newRotationArray[2])
+    if (beamEnergyArray.size())
+      if (beamEnergyArray.size() < 2) 
+      {
+        newEnergyArray[0] = beamEnergyArray[0];
+        newEnergyArray[1] = beamEnergyArray[0];
+      }
+      else if (beamEnergyArray.size() < 3)
+      {
+        newEnergyArray[0] = beamEnergyArray[0];
+        newEnergyArray[1] = beamEnergyArray[1];
+      }
+      else
+      {
+        newEnergyArray[0] = beamEnergyArray[0];
+        newEnergyArray[1] = beamEnergyArray[1];
+        newEnergyArray[2] = beamEnergyArray[2];
+      }
+
+    for (float energy = newEnergyArray[0]; energy <= newEnergyArray[1];
+      energy += newEnergyArray[2])
     {
-      auto rotatePhCmd = "/det/phantom/rotate/angle " + 
-        std::to_string(angle) + " deg";
-      auto beamEnergyCmd = "/gps/ene/mono " + beamEnergy + " MeV";
-      auto beamRunCmd = "/run/beamOn " + numOfBeam;
-      UImanager->ApplyCommand(beamEnergyCmd);
-      UImanager->ApplyCommand(rotatePhCmd);
-      UImanager->ApplyCommand(beamRunCmd);
+      for (float angle = newRotationArray[0]; angle <= newRotationArray[1];
+        angle += newRotationArray[2])
+      {
+        auto outputPath = createOutputDirs(energy, angle);
+        auto runOutputFileCmd = "/run/file/output " + outputPath;
+        auto rotatePhCmd = "/det/phantom/rotate/angle " + 
+          std::to_string(angle) + " deg";
+        auto beamEnergyCmd = "/gps/ene/mono " + std::to_string(energy) + " MeV";
+        auto beamRunCmd = "/run/beamOn " + numOfBeam;
+        UImanager->ApplyCommand(runOutputFileCmd);
+        UImanager->ApplyCommand(beamEnergyCmd);
+        UImanager->ApplyCommand(rotatePhCmd);
+        UImanager->ApplyCommand(beamRunCmd);
+      }
     }
   }
   else

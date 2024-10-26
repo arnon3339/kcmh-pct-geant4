@@ -11,7 +11,7 @@
 #include "G4ThreeVector.hh"
 #include "G4VPhysicalVolume.hh"
 #include "phantomConstruction.hh"
-#include "DetectorMessager.hh"
+#include "DetectorMessenger.hh"
 #include "G4SDManager.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4RunManager.hh"
@@ -19,20 +19,20 @@
 namespace kcmh
 {
   DetectorConstruction::DetectorConstruction(G4String phName)
-  :detMessager(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
+  :detMessenger(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
   {
     if (phName.compare("none"))
     {
       ph = new PhantomConstruction(phName);
       phanLog = ph->GetLogVolume();
-      detMessager = new DetectorMessager(this);
+      detMessenger = new DetectorMessenger(this);
       phAngle = 0. *deg;
     }
   }
 
   DetectorConstruction::~DetectorConstruction()
   {
-    delete detMessager;
+    delete detMessenger;
     delete ph;
     delete phPhys;
     delete envLog;

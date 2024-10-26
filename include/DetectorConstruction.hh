@@ -8,7 +8,7 @@ class G4VPhysicalVolume;
 
 namespace kcmh
 {
-  class DetectorMessager;
+  class DetectorMessenger;
 
   class DetectorConstruction: public G4VUserDetectorConstruction
   {
@@ -25,7 +25,7 @@ namespace kcmh
       G4String GetPhName() {return ph->GetPhName();};
 
     private:
-      DetectorMessager* detMessager;
+      DetectorMessenger* detMessenger;
       G4LogicalVolume* phanLog;
       G4double phAngle;
       G4LogicalVolume* envLog;

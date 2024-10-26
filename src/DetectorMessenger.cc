@@ -1,4 +1,4 @@
-#include "DetectorMessager.hh"
+#include "DetectorMessenger.hh"
 
 #include "DetectorConstruction.hh"
 #include "G4UIdirectory.hh"
@@ -9,14 +9,14 @@
 
 namespace kcmh
 {
-  DetectorMessager::DetectorMessager(DetectorConstruction* det)
+  DetectorMessenger::DetectorMessenger(DetectorConstruction* det)
   :fdet(det), fDirectory(0), fPhDirectory(0), fRotPhDirectory(0),
   fSetPhAngleCmd(0)
   {
     fDirectory = new G4UIdirectory("/det/");
     fDirectory->SetGuidance("Dector geometry control");
 
-    fPhDirectory = new G4UIdirectory("/det/phantom");
+    fPhDirectory = new G4UIdirectory("/det/phantom/");
     fPhDirectory->SetGuidance("Dector geometry control phantom");
 
     fRotPhDirectory = new G4UIdirectory("/det/phantom/rotate/");
@@ -31,7 +31,7 @@ namespace kcmh
     fSetPhAngleCmd->AvailableForStates(G4State_PreInit,G4State_Idle);    
   }
 
-  DetectorMessager::~DetectorMessager()
+  DetectorMessenger::~DetectorMessenger()
   {
     delete fDirectory;
     delete fPhDirectory;
@@ -39,7 +39,7 @@ namespace kcmh
     delete fSetPhAngleCmd;
   }
 
-  void DetectorMessager::SetNewValue(G4UIcommand* command, G4String newValue)
+  void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
   {
     if( command == fSetPhAngleCmd ) {
       auto inputValue = fSetPhAngleCmd->GetNewDoubleValue(newValue);
