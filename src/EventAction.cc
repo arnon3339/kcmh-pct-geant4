@@ -80,11 +80,11 @@ namespace kcmh
         
         G4double normTheVector = std::sqrt(
           std::pow(theVector[0], 2) + std::pow(theVector[1], 2) +
-          std::pow(theVector[3], 2)
+          std::pow(theVector[2], 2)
         );
         G4double normRefVector = std::sqrt(
           std::pow(refVector[0], 2) + std::pow(refVector[1], 2) +
-          std::pow(refVector[3], 2)
+          std::pow(refVector[2], 2)
         );
 
         G4double angle = 0.;
