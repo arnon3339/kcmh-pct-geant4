@@ -55,7 +55,7 @@ namespace kcmh
       analysisManager->FillNtupleIColumn(2, (*DTC)[i]->GetPixels()[1]);
       analysisManager->FillNtupleIColumn(3, (*DTC)[i]->GetLayerID());
       analysisManager->FillNtupleDColumn(4, (*DTC)[i]->GetEdep());
-      if (((*DTC)[i]->GetLayerID() != 0 && (*DTC)[i]->GetLayerID() != 1) &&
+      if (((*DTC)[i]->GetLayerID() != 0) && ((*DTC)[i]->GetLayerID() != 1) &&
         ((*DTC)[i-1]->GetLayerID() == ((*DTC)[i]->GetLayerID() -1)))
       {
         G4double refVector[] = {0., 0., dtcDistance};
