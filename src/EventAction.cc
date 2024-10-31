@@ -80,7 +80,7 @@ namespace kcmh
 
         if (std::abs(std::cos(angle)) > 1e-6) 
           analysisManager->FillNtupleDColumn(5, dtcDistance * (1 / std::cos(angle)));
-        else analysisManager->FillNtupleDColumn(5, 0.);
+        else analysisManager->FillNtupleDColumn(5, dtcDistance);
       }
       else
         analysisManager->FillNtupleDColumn(5, 0.);
