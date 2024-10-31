@@ -27,22 +27,14 @@ namespace kcmh
 
   void EventAction::EndOfEventAction(const G4Event* event)
   {
-    auto absThickness = 1.5 *mm;
-    auto alpideThickness = 50 *um;
     auto dtcDistance = 25. *mm;
     auto alpideSizeX = 30. *mm;
     auto alpideSizeY = 15. *mm;
-    auto numAlpideX = 9;
-    auto numAlpideY = 12;
     auto numPixelsXInAlpide = 1024;
     auto numPixelsYInAlpide = 512;
     auto pixelSizeX = alpideSizeX/numPixelsXInAlpide;
     auto pixelSizeY = alpideSizeY/numPixelsYInAlpide;
-    auto nist = G4NistManager::Instance();
-    auto siliconMat = nist->FindOrBuildMaterial("G4_Si");
-    auto siliconDen = siliconMat->GetDensity();
-    auto alMat = nist->FindOrBuildMaterial("G4_Al");
-    auto alDen = alMat->GetDensity();
+
     auto analysisManager = G4AnalysisManager::Instance();
     if (dtcTrackerID < 0) return;
 
@@ -101,13 +93,11 @@ namespace kcmh
         else angle = std::acos(dotProduct/productTwoNorms);
 
         analysisManager->FillNtupleDColumn(5, 
-          alpideThickness*(1/std::cos(angle))*siliconDen +
-          absThickness*(1/std::cos(angle))*alDen
+          dtcDistance*(1/std::cos(angle))
         );
       }
       else
         analysisManager->FillNtupleDColumn(5, 0.);
-      analysisManager->FillNtupleDColumn(5, (*DTC)[i]->GetEdep());
       analysisManager->FillNtupleIColumn(6, (*DTC)[i]->GetTrackID());
       analysisManager->FillNtupleIColumn(7, (*DTC)[i]->GetParentID());
       analysisManager->FillNtupleIColumn(8, (*DTC)[i]->GetPDGEncoding());
