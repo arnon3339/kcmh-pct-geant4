@@ -61,11 +61,11 @@ namespace kcmh
         G4double refVector[] = {0., 0., dtcDistance};
         G4double currentXY[] = {
           (*DTC)[i]->GetPixels()[0]*pixelSizeX,
-          (*DTC)[i]->GetPixels()[1]*pixelSizeY,
+          (*DTC)[i]->GetPixels()[1]*pixelSizeY
           };
         G4double prevXY[] = {
           (*DTC)[i-1]->GetPixels()[0]*pixelSizeX,
-          (*DTC)[i-1]->GetPixels()[1]*pixelSizeY,
+          (*DTC)[i-1]->GetPixels()[1]*pixelSizeY
           };
 
         G4double theVector[] = {
