@@ -6,7 +6,11 @@
 #include "G4UserEventAction.hh"
 #include "G4Event.hh"
 #include "RunAction.hh"
+#include "G4SystemOfUnits.hh"
 #include "G4AnalysisManager.hh"
+#include "G4NistManager.hh"
+
+#include <cmath>
 
 namespace kcmh
 {
@@ -23,8 +27,23 @@ namespace kcmh
 
   void EventAction::EndOfEventAction(const G4Event* event)
   {
+    auto absThickness = 1.5 *mm;
+    auto alpideThickness = 50 *um;
+    auto dtcDistance = 25. *mm;
+    auto alpideSizeX = 30. *mm;
+    auto alpideSizeY = 15. *mm;
+    auto numAlpideX = 9;
+    auto numAlpideY = 12;
+    auto numPixelsXInAlpide = 1024;
+    auto numPixelsYInAlpide = 512;
+    auto pixelSizeX = alpideSizeX/numPixelsXInAlpide;
+    auto pixelSizeY = alpideSizeY/numPixelsYInAlpide;
+    auto nist = G4NistManager::Instance();
+    auto siliconMat = nist->FindOrBuildMaterial("G4_Si");
+    auto siliconDen = siliconMat->GetDensity();
+    auto alMat = nist->FindOrBuildMaterial("G4_Al");
+    auto alDen = alMat->GetDensity();
     auto analysisManager = G4AnalysisManager::Instance();
-    // G4cout << "Event: " << event->GetEventID() << G4endl;
     if (dtcTrackerID < 0) return;
 
     auto hce = event->GetHCofThisEvent();
@@ -44,9 +63,54 @@ namespace kcmh
       analysisManager->FillNtupleIColumn(2, (*DTC)[i]->GetPixels()[1]);
       analysisManager->FillNtupleIColumn(3, (*DTC)[i]->GetLayerID());
       analysisManager->FillNtupleDColumn(4, (*DTC)[i]->GetEdep());
-      analysisManager->FillNtupleIColumn(5, (*DTC)[i]->GetTrackID());
-      analysisManager->FillNtupleIColumn(6, (*DTC)[i]->GetParentID());
-      analysisManager->FillNtupleIColumn(7, (*DTC)[i]->GetPDGEncoding());
+      if (((*DTC)[i]->GetLayerID() != 0 && (*DTC)[i]->GetLayerID() != 1) &&
+        ((*DTC)[i-1]->GetLayerID() == ((*DTC)[i]->GetLayerID() -1)))
+      {
+        G4double refVector[] = {0., 0., dtcDistance};
+        G4double currentXY[] = {
+          (*DTC)[i]->GetPixels()[0]*pixelSizeX,
+          (*DTC)[i]->GetPixels()[1]*pixelSizeY,
+          };
+        G4double prevXY[] = {
+          (*DTC)[i-1]->GetPixels()[0]*pixelSizeX,
+          (*DTC)[i-1]->GetPixels()[1]*pixelSizeY,
+          };
+
+        G4double theVector[] = {
+          currentXY[0] - prevXY[0],
+          currentXY[1] - prevXY[1],
+          dtcDistance
+          };
+
+        G4double dotProduct = 
+          refVector[0]*theVector[0] + refVector[1]*theVector[1] +
+          refVector[2]*theVector[2];
+        
+        G4double normTheVector = std::sqrt(
+          std::pow(theVector[0], 2) + std::pow(theVector[1], 2) +
+          std::pow(theVector[3], 2)
+        );
+        G4double normRefVector = std::sqrt(
+          std::pow(refVector[0], 2) + std::pow(refVector[1], 2) +
+          std::pow(refVector[3], 2)
+        );
+
+        G4double angle = 0.;
+        G4double productTwoNorms = normRefVector*normTheVector;
+        if (dotProduct > productTwoNorms) angle = 0.;
+        else angle = std::acos(dotProduct/productTwoNorms);
+
+        analysisManager->FillNtupleDColumn(5, 
+          alpideThickness*(1/std::cos(angle))*siliconDen +
+          absThickness*(1/std::cos(angle))*alDen
+        );
+      }
+      else
+        analysisManager->FillNtupleDColumn(5, 0.);
+      analysisManager->FillNtupleDColumn(5, (*DTC)[i]->GetEdep());
+      analysisManager->FillNtupleIColumn(6, (*DTC)[i]->GetTrackID());
+      analysisManager->FillNtupleIColumn(7, (*DTC)[i]->GetParentID());
+      analysisManager->FillNtupleIColumn(8, (*DTC)[i]->GetPDGEncoding());
       analysisManager->AddNtupleRow();
     }
   }
