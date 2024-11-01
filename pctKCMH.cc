@@ -8,6 +8,7 @@
 #include "PhysicsList.hh"
 #include "argparse.hh"
 #include "utils.hh"
+#include "CLHEP/Random/Random.h"
 
 #include <iostream>
 #include <filesystem>
@@ -19,7 +20,7 @@ using namespace kcmh;
 
 int main(int argc, char **argv)
 {
-
+  CLHEP::HepRandom::setTheSeed(123456);
   try
   {
     if (std::filesystem::is_directory("./output"))
