@@ -18,8 +18,8 @@
 
 namespace kcmh
 {
-  DetectorConstruction::DetectorConstruction(G4String phName)
-  :detMessenger(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
+  DetectorConstruction::DetectorConstruction(G4String phName, G4bool isVis)
+  :fIsVis(isVis), detMessenger(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
   {
     if (phName.compare("none"))
     {
@@ -56,8 +56,6 @@ namespace kcmh
     G4int numOfDtcLayer = 42;
     G4int numOfPixelRow = 1024;
     G4int numOfPixelCol = 512;
-    // G4int numOfPixelRow = 2;
-    // G4int numOfPixelCol = 2;
     G4double alpideSizeX = 3. *cm;
     G4double alpideSizeY = 1.38 *cm;
     G4double alpidePixelSizeX = alpideSizeX/numOfPixelRow;
@@ -253,22 +251,25 @@ namespace kcmh
       checkOverlaps
     );
 
-    new G4PVReplica(
-      "alpidePixelRowPhys",
-      alpidePixelLog,
-      alpidePixelRowLog,
-      kXAxis,
-      numOfPixelRow,
-      alpidePixelSizeX
-    );
-    new G4PVReplica(
-      "alpidePhys",
-      alpidePixelRowLog,
-      alpideLog,
-      kYAxis,
-      numOfPixelCol,
-      alpidePixelSizeY
-    );
+    if (!fIsVis)
+    {
+      new G4PVReplica(
+        "alpidePixelRowPhys",
+        alpidePixelLog,
+        alpidePixelRowLog,
+        kXAxis,
+        numOfPixelRow,
+        alpidePixelSizeX
+      );
+      new G4PVReplica(
+        "alpidePhys",
+        alpidePixelRowLog,
+        alpideLog,
+        kYAxis,
+        numOfPixelCol,
+        alpidePixelSizeY
+      );
+    }
     new G4PVReplica(
       "dtcXPhys",
       dtcChipLog,

@@ -84,7 +84,10 @@ int main(int argc, char **argv)
 
   runManager->SetUserInitialization(new PhysicsList());
   runManager->SetUserInitialization(new ActionInitialization());
-  runManager->SetUserInitialization(new DetectorConstruction(phName));
+  if (!macroFile.compare("init_vis.mac"))
+    runManager->SetUserInitialization(new DetectorConstruction(phName, true));
+  else
+    runManager->SetUserInitialization(new DetectorConstruction(phName));
 
   auto UImanager = G4UImanager::GetUIpointer();
   G4VisManager* vis = new G4VisExecutive(argc, argv);

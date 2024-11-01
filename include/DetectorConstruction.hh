@@ -13,7 +13,7 @@ namespace kcmh
   class DetectorConstruction: public G4VUserDetectorConstruction
   {
     public:
-      DetectorConstruction(G4String);
+      DetectorConstruction(G4String, G4bool isVis=false);
       ~DetectorConstruction() override;
 
       G4VPhysicalVolume* Construct() override;
@@ -25,6 +25,7 @@ namespace kcmh
       G4String GetPhName() {return ph->GetPhName();};
 
     private:
+      G4bool fIsVis;
       DetectorMessenger* detMessenger;
       G4LogicalVolume* phanLog;
       G4double phAngle;
