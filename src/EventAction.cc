@@ -75,8 +75,7 @@ namespace kcmh
         G4double angle = 0.;
         G4double productTwoNorms = normRefVector * normTheVector;
 
-        if (dotProduct > productTwoNorms) angle = 0.;
-        else angle = std::acos(std::clamp(dotProduct / productTwoNorms, -1.0, 1.0));
+        angle = std::acos(std::clamp(dotProduct / productTwoNorms, -1.0, 1.0));
 
         if (std::abs(std::cos(angle)) > 1e-6) 
           analysisManager->FillNtupleDColumn(5, dtcDistance * (1 / std::cos(angle)));
