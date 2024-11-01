@@ -46,23 +46,27 @@ namespace kcmh
     for (size_t i = 0; i < DTC->GetSize(); i++)
     {
       analysisManager->FillH1(0, (*DTC)[i]->GetLayerID());
-      if (((*DTC)[i]->GetLayerID() != 0) && ((*DTC)[i]->GetLayerID() != 1) &&
-        ((*DTC)[i-1]->GetLayerID() == ((*DTC)[i]->GetLayerID() - 1)))
+      if ((i > 0) && ((*DTC)[i-1]->GetLayerID() != ((*DTC)[i]->GetLayerID())))
       {
-        G4double refVector[] = {0., 0., dtcDistance};
-        G4double currentXY[] = {
+        G4double currentXYZ[] = {
           (*DTC)[i]->GetPixels()[0] * pixelSizeX,
-          (*DTC)[i]->GetPixels()[1] * pixelSizeY
+          (*DTC)[i]->GetPixels()[1] * pixelSizeY,
+          (*DTC)[i]->GetLayerID() * dtcDistance
         };
-        G4double prevXY[] = {
+        G4double prevXYZ[] = {
           (*DTC)[i-1]->GetPixels()[0] * pixelSizeX,
-          (*DTC)[i-1]->GetPixels()[1] * pixelSizeY
+          (*DTC)[i-1]->GetPixels()[1] * pixelSizeY,
+          (*DTC)[i-1]->GetLayerID() * dtcDistance
         };
+        G4double totalThickness = std::abs(currentXYZ[2] - prevXYZ[2]);
+        if (((*DTC)[i]->GetLayerID() != 0) || ((*DTC)[i-1]->GetLayerID() != 0))
+          totalThickness -= dtcDistance;
 
+        G4double refVector[] = {0., 0., dtcDistance};
         G4double theVector[] = {
-          currentXY[0] - prevXY[0],
-          currentXY[1] - prevXY[1],
-          dtcDistance
+          currentXYZ[0] - prevXYZ[0],
+          currentXYZ[1] - prevXYZ[1],
+          currentXYZ[2] - prevXYZ[2]
         };
 
         G4double dotProduct =
@@ -72,14 +76,13 @@ namespace kcmh
         G4double normTheVector = std::hypot(theVector[0], theVector[1], theVector[2]);
         G4double normRefVector = std::hypot(refVector[0], refVector[1], refVector[2]);
 
-        G4double angle = 0.;
         G4double productTwoNorms = normRefVector * normTheVector;
 
-        angle = std::acos(std::clamp(dotProduct / productTwoNorms, -1.0, 1.0));
+        G4double angle = std::acos(std::clamp(dotProduct / productTwoNorms, -1.0, 1.0));
 
         if (std::abs(std::cos(angle)) > 1e-6) 
-          analysisManager->FillNtupleDColumn(5, dtcDistance * (1 / std::cos(angle)));
-        else analysisManager->FillNtupleDColumn(5, dtcDistance);
+          analysisManager->FillNtupleDColumn(5, totalThickness * (1 / std::cos(angle)));
+        else analysisManager->FillNtupleDColumn(5, totalThickness);
       }
       else
         analysisManager->FillNtupleDColumn(5, 0.);
