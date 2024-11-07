@@ -1,5 +1,6 @@
 import argparse
 import os
+from os import path
 from multiprocessing import Pool
 import math
 
@@ -15,7 +16,7 @@ parser.add_argument('--energy', '-e', nargs="*", type=int,
 parser_args = parser.parse_args()
 
 def run_pct_kcmh(en_range=[]):
-    os.system(f'cd {os.getcwd()}/build && \
+    os.system(f'cd {path.join(os.getcwd(), "build")} && \
 ./pctKCMH -m {parser_args.macro} -p {parser_args.phantom} -b {parser_args.beam} \
 -t {parser_args.thread} -e {" ".join([str(en) for en in parser_args.energy])}')
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     en_args_len = len(parser_args.energy)
     en_step = 1 if en_args_len < 3 else parser_args.energy[2]
     if parser_args.process == 1 or  en_args_len == 1:
-        os.system(f'cd /home/arnon/Projects/kcmh-pct-geant4/build && \
+        os.system(f'cd {path.join(os.getcwd(), "build")} && \
 ./pctKCMH -m {parser_args.macro} -p {parser_args.phantom} -b {parser_args.beam} \
 -t {parser_args.thread} -e {" ".join([str(en) for en in parser_args.energy])}')
     else:
