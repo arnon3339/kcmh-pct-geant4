@@ -15,7 +15,7 @@ parser.add_argument('--energy', '-e', nargs="*", type=int,
 parser_args = parser.parse_args()
 
 def run_pct_kcmh(en_range=[]):
-    os.system(f'cd /home/arnon/Projects/kcmh-pct-geant4/build && \
+    os.system(f'cd {os.getcwd()}/build && \
 ./pctKCMH -m {parser_args.macro} -p {parser_args.phantom} -b {parser_args.beam} \
 -t {parser_args.thread} -e {" ".join([str(en) for en in parser_args.energy])}')
 
