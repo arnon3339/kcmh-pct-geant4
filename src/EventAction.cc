@@ -46,6 +46,16 @@ namespace kcmh
     for (size_t i = 0; i < DTC->GetSize(); i++)
     {
       analysisManager->FillH1(0, (*DTC)[i]->GetLayerID());
+      if ((*DTC)[i]->GetLayerID() == 0)
+        analysisManager->FillH2(0, (*DTC)[i]->GetPixels()[0], 
+          (*DTC)[i]->GetPixels()[1]);
+
+      analysisManager->FillNtupleIColumn(0, event->GetEventID());
+      analysisManager->FillNtupleIColumn(1, (*DTC)[i]->GetPixels()[0]);
+      analysisManager->FillNtupleIColumn(2, (*DTC)[i]->GetPixels()[1]);
+      analysisManager->FillNtupleIColumn(3, (*DTC)[i]->GetLayerID());
+      analysisManager->FillNtupleDColumn(4, (*DTC)[i]->GetEdep());
+
       if ((i > 0) && ((*DTC)[i-1]->GetLayerID() != ((*DTC)[i]->GetLayerID())))
       {
         G4double currentXYZ[] = {
@@ -59,7 +69,7 @@ namespace kcmh
           (*DTC)[i-1]->GetLayerID() * dtcDistance
         };
         G4double totalThickness = std::abs(currentXYZ[2] - prevXYZ[2]);
-        if (((*DTC)[i]->GetLayerID() != 0) || ((*DTC)[i-1]->GetLayerID() != 0))
+        if (((*DTC)[i]->GetLayerID() == 0) || ((*DTC)[i-1]->GetLayerID() == 0))
           totalThickness -= dtcDistance;
 
         G4double refVector[] = {0., 0., dtcDistance};
