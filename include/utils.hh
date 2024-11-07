@@ -53,6 +53,8 @@ std::string createOutputDirs(const float& energy, const float& angle)
 
   try
   {
+    if (std::filesystem::is_directory(outputDir))
+      std::filesystem::remove_all(outputDir);
     std::filesystem::create_directories(outputDir);
     return outputPath;
   }

@@ -23,8 +23,7 @@ int main(int argc, char **argv)
   CLHEP::HepRandom::setTheSeed(123456);
   try
   {
-    if (std::filesystem::is_directory("./output"))
-      std::filesystem::remove_all("./output");
+    if (std::filesystem::create_directory("./output")){}
   }
   catch(const std::filesystem::filesystem_error& e)
   {
