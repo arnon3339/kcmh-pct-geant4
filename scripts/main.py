@@ -1,6 +1,6 @@
 import os
 from os import path
-from modules.physics import gen_wepl_data, get_range
+from modules.physics import *
 
 from modules.plots import *
 import pandas as pd
@@ -19,5 +19,4 @@ def plot_range():
     plot_dtc_range((x, y)) 
 
 if __name__ == '__main__':
-    for en in range(200, 201):
-        en_range = gen_wepl_data(en)
+    get_proton_range(202)

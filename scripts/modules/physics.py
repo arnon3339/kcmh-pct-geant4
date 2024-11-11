@@ -6,7 +6,7 @@ import numpy as np
 import modules.plots as plot
 import warnings
 
-OUTDIR = "../build/output"
+OUTDIR = "/data/pct/sim/cal/output"
 
 DENSITY_DICT = {
     'alpide': 2.33,
@@ -66,46 +66,40 @@ def get_range(data: pd.DataFrame):
     
     return x, y
 
-def gen_wepl_data(en):
-    en_dir = 'eMeV_' + '0'*(3 - len(str(en))) + str(en)
-    root_files = [f for f in os.listdir(
-        path.join(OUTDIR, en_dir,
-                  'projection_000')) if '_t' in f]
+def get_proton_range(en, wepl=False):
+    en_dir_name = f'eMeV_{"0"*(3 - len(str(en))) + str(en)}' 
+    root_files = [
+        f for f in os.listdir(
+            path.join(
+                OUTDIR, 
+                en_dir_name,
+                'projection_000'
+                )
+            ) if '_t' in f
+        ]
 
-    root_files.sort(key=lambda x: int(x.split('_t')[-1].split('.')[0]))
-    dfs = []
+    num_proton = 0
+    thicknesses = []
     for f in root_files:
-        print(f"Starting {f}")
-        if len(root_files):
-            with uproot.open(path.join(OUTDIR, en_dir, 
-                                    'projection_000',
-                                    f)) as root_data:
-                tree = root_data['pCT;1']
-                df_tmp = tree.arrays(library='pd')
-                if len(df_tmp.index):
-                    df_tmp['wepl'] = np.zeros(len(df_tmp.index))
-                    evt_ids = np.sort(np.unique(df_tmp['eventID'].values))
-                    for evt_id in evt_ids:
-                        if evt_id == 0:
-                            continue
-                        df_tmp_id = df_tmp[df_tmp.eventID==evt_id]
-                        for index, row in df_tmp_id.iterrows():
-                            layer_ids = np.sort(np.unique(df_tmp['layerID'].values))
-                            for layer_id in layer_ids:
-                                welp = 0
-                                current_df = df_tmp_id[df_tmp_id.layerID==layer_id]
-                                next_df = df_tmp_id[df_tmp_id.layerID==(layer_id + 1)]
-                                if len(current_df.index):
-                                    if len(next_df.index):
-                                        welp = get_WEPL(
-                                            get_thickness(
-                                                (current_df['pixelX'].values[0], current_df['pixelY'].values[0]),
-                                                (next_df['pixelX'].values[0], next_df['pixelY'].values[0])
-                                                )
-                                            )
-                                        df_tmp.loc[(df_tmp.eventID == evt_id) & (df_tmp.layerID == layer_id), 'welp'] = welp
-        print(f"Finished {f}")
-                    # wepls.append(wepl)
-    pd.concat(dfs, ignore_index=True).\
-        to_feather(f'./output/data/wepl/eMeV_{"0"*(3 - len(str(en))) + str(en)}.feather')
-    # plot.plot_dtc_wepl_hist_1d(wepls) 
+        print(f'Starting file {f}')
+        with uproot.open(path.join(
+                OUTDIR,
+                en_dir_name, 
+                'projection_000',
+                f
+            )) as root_data:
+
+            tree = root_data['pCT;1']
+            df = tree.arrays(library='pd')
+
+            num_proton += len(df[df.layerID == 0].index)
+            df_unique_sum = df.groupby('eventID',
+                                       as_index=False)['thickness'].sum()
+            thicknesses += df_unique_sum['thickness'].values.tolist()
+        print(f'Finished file {f}')
+    
+    data = np.array(thicknesses)
+    x_data = np.linspace(data.min(), data.max(), 200)
+    y_data = np.array([np.sum(data >= x) for x in x_data])
+    plot.plot_dtc_range([x_data, y_data])
+    print(x_data[np.where(y_data <= num_proton/2.)[0][0]])
