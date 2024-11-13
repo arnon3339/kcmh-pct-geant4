@@ -29,19 +29,22 @@ class TrackerHit : public G4VHit
     void SetPDGEncoding (G4int PDGEncoding) { fPDGEncoding = PDGEncoding; }
     void SetPixels      (G4int, G4int);
     void SetParentID (G4int parentID) { fParentID = parentID; }
+    void SetK (G4double K) { fK = K; };
 
     // Get methods
     G4int GetTrackID() const     { return fTrackID; };
     G4int GetLayerID() const   { return fLayerID; };
     G4double GetEdep() const     { return fEdep; };
     G4int* GetPixels() { return fPixels; };
-    G4int GetPDGEncoding() { return fPDGEncoding; }
-    G4int GetParentID() { return fParentID; }
+    G4int GetPDGEncoding() { return fPDGEncoding; };
+    G4int GetParentID() { return fParentID; };
+    G4double GetK() { return fK; };
 
   private:
     G4int         fTrackID = -1;
     G4int         fLayerID = -1;
     G4double      fEdep = 0.;
+    G4double      fK = 0.;
     G4int         fPixels[2]{-1, -1};
     G4int         fPDGEncoding = -1;
     G4int         fParentID = -1;

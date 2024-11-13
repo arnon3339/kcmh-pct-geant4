@@ -61,6 +61,7 @@ namespace kcmh
 
     }
     newHit->SetEdep(edep);
+    newHit->SetK(step->GetPostStepPoint()->GetKineticEnergy());
     newHit->SetPDGEncoding(track->GetParticleDefinition()->GetPDGEncoding());
     newHit->SetParentID(track->GetParentID());
     newHit->SetTrackID(step->GetTrack()->GetTrackID());

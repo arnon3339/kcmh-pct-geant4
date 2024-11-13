@@ -54,7 +54,8 @@ namespace kcmh
       analysisManager->FillNtupleIColumn(1, (*DTC)[i]->GetPixels()[0]);
       analysisManager->FillNtupleIColumn(2, (*DTC)[i]->GetPixels()[1]);
       analysisManager->FillNtupleIColumn(3, (*DTC)[i]->GetLayerID());
-      analysisManager->FillNtupleDColumn(4, (*DTC)[i]->GetEdep());
+      analysisManager->FillNtupleDColumn(4, (*DTC)[i]->GetK());
+      analysisManager->FillNtupleDColumn(5, (*DTC)[i]->GetEdep());
 
       if ((i > 0) && ((*DTC)[i-1]->GetLayerID() != ((*DTC)[i]->GetLayerID())))
       {
@@ -91,14 +92,14 @@ namespace kcmh
         G4double angle = std::acos(std::clamp(dotProduct / productTwoNorms, -1.0, 1.0));
 
         if (std::abs(std::cos(angle)) > 1e-6) 
-          analysisManager->FillNtupleDColumn(5, totalThickness * (1 / std::cos(angle)));
-        else analysisManager->FillNtupleDColumn(5, totalThickness);
+          analysisManager->FillNtupleDColumn(6, totalThickness * (1 / std::cos(angle)));
+        else analysisManager->FillNtupleDColumn(6, totalThickness);
       }
       else
-        analysisManager->FillNtupleDColumn(5, 0.);
-      analysisManager->FillNtupleIColumn(6, (*DTC)[i]->GetTrackID());
-      analysisManager->FillNtupleIColumn(7, (*DTC)[i]->GetParentID());
-      analysisManager->FillNtupleIColumn(8, (*DTC)[i]->GetPDGEncoding());
+        analysisManager->FillNtupleDColumn(6, 0.);
+      analysisManager->FillNtupleIColumn(7, (*DTC)[i]->GetTrackID());
+      analysisManager->FillNtupleIColumn(8, (*DTC)[i]->GetParentID());
+      analysisManager->FillNtupleIColumn(9, (*DTC)[i]->GetPDGEncoding());
       analysisManager->AddNtupleRow();
     }
   }

@@ -19,4 +19,5 @@ def plot_range():
     plot_dtc_range((x, y)) 
 
 if __name__ == '__main__':
-    get_proton_range(202)
+    # get_proton_range(202, wepl=True)
+    print(get_WEPL(80, 200, mat='dtc'))

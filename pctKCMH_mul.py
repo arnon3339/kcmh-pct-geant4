@@ -16,6 +16,7 @@ parser.add_argument('--energy', '-e', nargs="*", type=int,
 parser_args = parser.parse_args()
 
 def run_pct_kcmh(en_range=[]):
+    print(en_range)
     os.system(f'cd {path.join(os.getcwd(), "build")} && \
 ./pctKCMH -m {parser_args.macro} -p {parser_args.phantom} -b {parser_args.beam} \
 -t {parser_args.thread} -e {" ".join([str(en) for en in parser_args.energy])}')
@@ -42,5 +43,5 @@ if __name__ == '__main__':
                     en_process_list.append(en_list[i * num_en_split:\
                         (i + 1) * num_en_split])
             with Pool(parser_args.process) as pool:
-                pool.map(run_pct_kcmh, [[en[0], en[-1] + en_step, en_step]\
+                pool.map(run_pct_kcmh, [[en[0], en[-1], en_step]\
                     for en in en_process_list])

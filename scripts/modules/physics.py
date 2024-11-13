@@ -4,6 +4,7 @@ import uproot
 import pandas as pd
 import numpy as np
 import modules.plots as plot
+from modules import utils
 import warnings
 
 OUTDIR = "/data/pct/sim/cal/output"
@@ -13,8 +14,13 @@ DENSITY_DICT = {
     'absorber': 2.70
 }
 
+WATER_DENS = 1
+ALUMINIUM_DENS = 2.7
+SILICON_DENS = 2.33
+AIR_DENS = 0.0012
+
 def get_thickness(current_pos, next_pos, ref=False):
-    abs_thickness = 1.5 #mm
+    abs_thickness = 3.5 #mm
     alpide_thickness = 50e-3 #mm
     dtc_distance = 25 #mm
     alpide_size_x = 30 #mm
@@ -51,20 +57,24 @@ def get_thickness(current_pos, next_pos, ref=False):
             'absorber': abs_thickness/np.cos(angle)
             }
 
-def get_WEPL(data):
-    wepl = 0.
-    for d_k, d_v in data.items():
-        wepl += DENSITY_DICT[d_k]*d_v
-    
-    return wepl
+def get_WEPL(thick, en, mat='water'):
+    water_range = utils.get_range(en, 'water')
+    if mat.lower() == 'dtc':
+        al_range = utils.get_range(en, 'aluminium')
+        silicon_range = utils.get_range(en, 'silicon')
+        air_range = utils.get_range(en, 'air')
 
-def get_range(data: pd.DataFrame):
-    x = np.linspace(0, 200, 100)
-    y = np.zeros(100)
-    for i in range(100):
-        y[i] = len(data[data.welp >= x[i]].index)
-    
-    return x, y
+        range_avg = 1./((1./silicon_range)*0.05 +
+            (1./al_range)*3.5 + (1./air_range)*(25. - 3.5 - 0.05))
+        
+        print(f'water range: {water_range}')
+        print(f'aluminium range: {al_range}')
+        print(f'silicon range: {silicon_range}')
+        print(f'air range: {air_range}')
+        print(f'average range: {range_avg}')
+        return thick*water_range/range_avg
+    else:
+        return thick*water_range/utils.get_range(en, mat)
 
 def get_proton_range(en, wepl=False):
     en_dir_name = f'eMeV_{"0"*(3 - len(str(en))) + str(en)}' 
@@ -95,11 +105,17 @@ def get_proton_range(en, wepl=False):
             num_proton += len(df[df.layerID == 0].index)
             df_unique_sum = df.groupby('eventID',
                                        as_index=False)['thickness'].sum()
-            thicknesses += df_unique_sum['thickness'].values.tolist()
+            if wepl:
+                thicknesses += (
+                    get_WEPL(df_unique_sum['thickness'].values, en, 'dtc')
+                    ).tolist()
+            else:
+                thicknesses += df_unique_sum['thickness'].values.tolist()
         print(f'Finished file {f}')
     
     data = np.array(thicknesses)
     x_data = np.linspace(data.min(), data.max(), 200)
     y_data = np.array([np.sum(data >= x) for x in x_data])
-    plot.plot_dtc_range([x_data, y_data])
+    plot.plot_dtc_range([x_data, y_data], 
+                        name="dtc_range_plot_wepl" if wepl else "dtc_range_plot")
     print(x_data[np.where(y_data <= num_proton/2.)[0][0]])

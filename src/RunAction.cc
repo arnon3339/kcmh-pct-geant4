@@ -34,6 +34,7 @@ namespace kcmh
     analysisManager->CreateNtupleIColumn("pixelX");
     analysisManager->CreateNtupleIColumn("pixelY");
     analysisManager->CreateNtupleIColumn("layerID");
+    analysisManager->CreateNtupleDColumn("K");
     analysisManager->CreateNtupleDColumn("edep");
     analysisManager->CreateNtupleDColumn("thickness");
     analysisManager->CreateNtupleIColumn("trackID");

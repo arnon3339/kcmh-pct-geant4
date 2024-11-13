@@ -137,10 +137,10 @@ int main(int argc, char **argv)
         newEnergyArray[2] = beamEnergyArray[2];
       }
 
-    for (float energy = newEnergyArray[0]; energy < newEnergyArray[1];
+    for (float energy = newEnergyArray[0]; energy <= newEnergyArray[1];
       energy += newEnergyArray[2])
     {
-      for (float angle = newRotationArray[0]; angle < newRotationArray[1];
+      for (float angle = newRotationArray[0]; angle <= newRotationArray[1];
         angle += newRotationArray[2])
       {
         auto outputPath = createOutputDirs(energy, angle);
