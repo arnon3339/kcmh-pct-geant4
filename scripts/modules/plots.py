@@ -58,3 +58,20 @@ def plot_entries_thickness_hist_1d(*args, **kwargs):
     plt.hist(data, bins=range(x_min, x_max, xbin))
     plt.savefig(f"""./output/images/{kwargs["name"] if "name"
         in kwargs.keys() else "entries_thickness_hits_1d.png"}""", dpi=300)
+
+def plot_range_en(*args, **kwargs):
+    aluminium_dens = 2.7
+    silicon_dens = 2.33
+    air_dens = 0.0012
+    avg_dens = (aluminium_dens*3.511 + silicon_dens*0.039 +
+        air_dens*(25. - 3.511 - 0.039))/(25.)
+    if 'data' in kwargs.keys():
+        data = kwargs['data']
+    else:
+        data = args[0]
+    
+    fig, ax = plt.subplots(figsize=(12, 10))
+    # ax.plot(data['energy'], data['range'])
+    ax.scatter(data['energy'], data['range']*avg_dens, marker='_')
+    plt.savefig(f"""./output/images/{kwargs["name"] if "name"
+        in kwargs.keys() else "proton_range_en.png"}""", dpi=300)

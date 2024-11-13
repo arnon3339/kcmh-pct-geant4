@@ -4,7 +4,7 @@ import uproot
 import pandas as pd
 import numpy as np
 import modules.plots as plot
-from modules import utils
+from modules import utils, analyse
 import warnings
 
 OUTDIR = "/data/pct/sim/cal/output"
@@ -91,7 +91,6 @@ def get_proton_range(en, wepl=False):
     num_proton = 0
     thicknesses = []
     for f in root_files:
-        print(f'Starting file {f}')
         with uproot.open(path.join(
                 OUTDIR,
                 en_dir_name, 
@@ -102,20 +101,42 @@ def get_proton_range(en, wepl=False):
             tree = root_data['pCT;1']
             df = tree.arrays(library='pd')
 
-            num_proton += len(df[df.layerID == 0].index)
-            df_unique_sum = df.groupby('eventID',
-                                       as_index=False)['thickness'].sum()
-            if wepl:
-                thicknesses += (
-                    get_WEPL(df_unique_sum['thickness'].values, en, 'dtc')
-                    ).tolist()
-            else:
-                thicknesses += df_unique_sum['thickness'].values.tolist()
-        print(f'Finished file {f}')
+            if len(df.index):
+                num_proton += len(df[df.layerID == 0].index)
+                df_unique_sum = df.groupby('eventID',
+                                        as_index=False)['thickness'].sum()
+                if wepl:
+                    thicknesses += (
+                        get_WEPL(df_unique_sum['thickness'].values, en, 'dtc')
+                        ).tolist()
+                else:
+                    thicknesses += df_unique_sum['thickness'].values.tolist()
     
-    data = np.array(thicknesses)
-    x_data = np.linspace(data.min(), data.max(), 200)
-    y_data = np.array([np.sum(data >= x) for x in x_data])
-    plot.plot_dtc_range([x_data, y_data], 
-                        name="dtc_range_plot_wepl" if wepl else "dtc_range_plot")
-    print(x_data[np.where(y_data <= num_proton/2.)[0][0]])
+    try:
+        data = np.array(thicknesses)
+        x_data = np.linspace(data.min(), data.max(), 200)
+        y_data = np.array([np.sum(data >= x) for x in x_data])
+        return x_data[np.where(y_data <= num_proton/2.)[0][0]]
+    except:
+        return -1
+    # if len(y_data):
+    #     return 
+    # plot.plot_dtc_range([x_data, y_data], 
+    #                     name="dtc_range_plot_wepl" if wepl else "dtc_range_plot")
+    # print(x_data[np.where(y_data <= num_proton/2.)[0][0]])
+
+def get_en_from_dtc(thick):
+    cofs = [-3.40743164e-05, 2.75444697e-02,1.31743588e-01, -9.22327146e+00 - thick]
+    try:
+        result = np.roots(cofs)
+        return result[(result > 0) & (result < 230)][0]
+    except:
+        return 0.
+
+def get_ren_from_dtc(en, thick):
+    cofs = [-3.40743164e-05, 2.75444697e-02,1.31743588e-01, -9.22327146e+00 - thick]
+    try:
+        result = np.roots(cofs)
+        return en - result[(result > 0) & (result < 230)][0]
+    except:
+        return en
