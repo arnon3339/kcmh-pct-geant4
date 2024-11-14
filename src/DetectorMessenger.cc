@@ -1,6 +1,7 @@
 #include "DetectorMessenger.hh"
 
 #include "PctDetectorConstruction.hh"
+#include "LynxDetectorConstruction.hh"
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcommand.hh"
@@ -30,6 +31,17 @@ namespace kcmh
     fSetPhAngleCmd->SetDefaultValue(180 *deg);
     fSetPhAngleCmd->SetDefaultUnit("deg");
     fSetPhAngleCmd->AvailableForStates(G4State_PreInit,G4State_Idle);    
+
+    fLynxDiretory = new G4UIdirectory("/det/lynx/");
+    fLynxDiretory->SetGuidance("Dector geometry control lynx");
+
+    fSetLynxPosZ
+      = new G4UIcmdWithADoubleAndUnit("/det/lynx/posz",this);
+    fSetLynxPosZ->SetGuidance("Input the position (cm) for lynx detector.");
+    fSetLynxPosZ->SetParameterName("Position(cm)", false);
+    fSetLynxPosZ->SetDefaultValue(0. *cm);
+    fSetLynxPosZ->SetDefaultUnit("cm");
+    fSetLynxPosZ->AvailableForStates(G4State_PreInit,G4State_Idle);    
   }
 
   DetectorMessenger::~DetectorMessenger()
@@ -38,6 +50,8 @@ namespace kcmh
     delete fPhDirectory;
     delete fRotPhDirectory;
     delete fSetPhAngleCmd;
+    delete fLynxDiretory;
+    delete fSetLynxPosZ;
   }
 
   void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
@@ -45,6 +59,12 @@ namespace kcmh
     if( command == fSetPhAngleCmd ) {
       auto inputValue = fSetPhAngleCmd->GetNewDoubleValue(newValue);
       dynamic_cast<PctDetectorConstruction*>(fdet)->RotatePhantom(inputValue);
+    }
+
+    if (command == fSetLynxPosZ)
+    {
+      auto inputValue = fSetPhAngleCmd->GetNewDoubleValue(newValue);
+      dynamic_cast<LynxDetectorConstruction*>(fdet)->SetPosZ(inputValue);
     }
   }
 } // namespace kcmh

@@ -13,20 +13,17 @@ namespace kcmh
   class LynxDetectorConstruction: public G4VUserDetectorConstruction
   {
     public:
-      LynxDetectorConstruction(G4String, G4bool isVis=false);
+      LynxDetectorConstruction(G4bool isVis=false);
       ~LynxDetectorConstruction() override;
 
       G4VPhysicalVolume* Construct() override;
       void ConstructSDandField() override;
+      void SetPosZ(const G4int);
 
     private:
+      G4double fZPos;
       G4bool fIsVis;
       DetectorMessenger* detMessenger;
-      G4LogicalVolume* phanLog;
-      G4double phAngle;
-      G4LogicalVolume* envLog;
-      G4VPhysicalVolume* phPhys;
-      PhantomConstruction* ph;
   };
 } // namespace kcmh
 #endif

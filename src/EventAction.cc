@@ -14,7 +14,7 @@
 
 namespace kcmh
 {
-  EventAction::EventAction(const RunAction* runAction)
+  EventAction::EventAction(RunAction* runAction)
   :fRunAction(runAction){}
 
   EventAction::~EventAction(){}
@@ -25,7 +25,7 @@ namespace kcmh
       GetCollectionID("dtcHitsCollection");
 
     lynxTrackerID = G4SDManager::GetSDMpointer()->
-      GetCollectionID("dtcHitsCollection");
+      GetCollectionID("LynxHitsCollection");
   }
 
   void EventAction::EndOfEventAction(const G4Event* event)
@@ -49,7 +49,6 @@ namespace kcmh
     auto pixelSizeY = alpideSizeY/numPixelsYInAlpide;
 
     auto analysisManager = G4AnalysisManager::Instance();
-
     auto hce = event->GetHCofThisEvent();
     TrackerHitsCollection* DTC = nullptr;
 
@@ -118,6 +117,15 @@ namespace kcmh
 
   void EventAction::collectLynxHits(const G4Event* event)
   {
+    auto analysisManager = G4AnalysisManager::Instance();
+    auto hce = event->GetHCofThisEvent();
+    TrackerHitsCollection* LYNX = nullptr;
 
+    if (hce) LYNX = (TrackerHitsCollection*)hce->GetHC(dtcTrackerID);
+
+    for (size_t i = 0; i < LYNX->GetSize(); i++)
+    {
+      fRunAction->AddAccValues((*LYNX)[i]->GetPixels());
+    }
   }
 } // namespace kcmh

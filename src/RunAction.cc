@@ -2,21 +2,28 @@
 #include "PctDetectorConstruction.hh"
 #include "RunActionMessenger.hh"
 #include "G4Run.hh"
+#include "PrimaryGeneratorAction.hh"
 #include "G4AnalysisManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4RunManager.hh"
 #include "G4String.hh"
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 
 #include <iostream>
 #include <filesystem>
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <memory>
+
+using namespace boost::accumulators;
 
 namespace kcmh
 {
   RunAction::RunAction(const G4int simMode)
-  : fRunActionMessenger(new RunActionMessenger(this)), fSimMode(simMode)
+  : fRunActionMessenger(new RunActionMessenger(this)), fSimMode(simMode),
+  beamSigma(0), beamSigmaR(0)
   {
 
     auto analysisManager = G4AnalysisManager::Instance(); 
@@ -48,16 +55,13 @@ namespace kcmh
     }
     else if (simMode == 1)
     {
-      // analysisManager->CreateH2("Layer0", "XY Histogram in the Tracker", 
-      //   numAlpideCol*numOfPixelRow/100, 0, numAlpideCol*numOfPixelRow,
-      //   numAlpideRow*numOfPixelCol/100, 0, numAlpideRow*numOfPixelCol);
-      // analysisManager->CreateNtuple("Lynx", "KCMH Lynx");
-      // analysisManager->CreateNtupleIColumn("eventID");
-      // analysisManager->CreateNtupleIColumn("pixelX");
-      // analysisManager->CreateNtupleIColumn("pixelY");
-      // analysisManager->CreateNtupleIColumn("layerID");
-      // analysisManager->FinishNtuple();
+      fAccX = std::make_unique<boost::accumulators::accumulator_set<double,
+      boost::accumulators::features<boost::accumulators::tag::mean,
+      boost::accumulators::tag::variance>>>();
 
+      fAccY = std::make_unique<boost::accumulators::accumulator_set<double,
+      boost::accumulators::features<boost::accumulators::tag::mean,
+      boost::accumulators::tag::variance>>>();
     }
   }
 
@@ -76,8 +80,35 @@ namespace kcmh
 
   void RunAction::EndOfRunAction(const G4Run*)
   {
-    auto analysisManager = G4AnalysisManager::Instance();
-    analysisManager->Write();  // Write all histograms to file
-    analysisManager->CloseFile();  // Close the ROOT file
+    if (fSimMode == 0)
+    {
+      auto analysisManager = G4AnalysisManager::Instance();
+      analysisManager->Write();  // Write all histograms to file
+      analysisManager->CloseFile();  // Close the ROOT file
+    }
+    else if (fSimMode == 1)
+    {
+      auto particleAction = (PrimaryGeneratorAction*)G4RunManager::GetRunManager()
+        ->GetUserPrimaryGeneratorAction();
+      auto particleGun = particleAction->GetParticleGun();
+    }
+  }
+
+  void RunAction::InitLynxAcc()
+  {
+    fAccX = std::make_unique<accumulator_set<double, features<tag::mean, tag::variance>>>();
+    fAccY = std::make_unique<accumulator_set<double, features<tag::mean, tag::variance>>>();
+  }
+
+  void RunAction::ResetLynxAcc()
+  {
+    fAccX.reset();
+    fAccY.reset();
+  }
+
+  void RunAction::AddAccValues(G4int* xy)
+  {
+    (*fAccX)(xy[0]);
+    (*fAccY)(xy[1]);
   }
 } // namespace kcmh

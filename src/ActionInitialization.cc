@@ -1,9 +1,9 @@
 #include "ActionInitialization.hh"
+
 #include "RunAction.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "EventAction.hh"
-
-#include <string>
+#include "G4SystemOfUnits.hh"
 
 namespace kcmh
 {
@@ -15,6 +15,9 @@ namespace kcmh
       (!G4StrUtil::icompare(mode, "lynx")))
       fSimMode = 1;
   }
+
+  ActionInitialization::~ActionInitialization()
+  {}
 
   void ActionInitialization::Build() const
   {

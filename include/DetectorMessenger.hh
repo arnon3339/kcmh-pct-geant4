@@ -18,7 +18,9 @@ namespace kcmh
       G4UIdirectory*              fDirectory;
       G4UIdirectory*              fPhDirectory;
       G4UIdirectory*              fRotPhDirectory;
+      G4UIdirectory*              fLynxDiretory;
       G4UIcmdWithADoubleAndUnit*  fSetPhAngleCmd;
+      G4UIcmdWithADoubleAndUnit*  fSetLynxPosZ;
 
     public:
       DetectorMessenger(G4VUserDetectorConstruction*);

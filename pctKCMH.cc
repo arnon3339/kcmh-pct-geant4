@@ -5,6 +5,7 @@
 #include "G4VisExecutive.hh"
 #include "ActionInitialization.hh"
 #include "PctDetectorConstruction.hh"
+#include "LynxDetectorConstruction.hh"
 #include "PhysicsList.hh"
 #include "argparse.hh"
 #include "utils.hh"
@@ -89,76 +90,125 @@ int main(int argc, char **argv)
 
   runManager->SetUserInitialization(new PhysicsList());
   runManager->SetUserInitialization(new ActionInitialization(simMode));
-  if (!macroFile.compare("init_vis.mac"))
-    runManager->SetUserInitialization(new PctDetectorConstruction(phName, true));
+
+  if (!G4StrUtil::icompare(simMode, "pct"))
+  {
+    if (!macroFile.compare("init_vis.mac"))
+      runManager->SetUserInitialization(new PctDetectorConstruction(phName, true));
+    else
+      runManager->SetUserInitialization(new PctDetectorConstruction(phName));
+  }
+  else if (!G4StrUtil::icompare(simMode, "lynx"))
+  {
+    if (!macroFile.compare("init_vis.mac"))
+      runManager->SetUserInitialization(new LynxDetectorConstruction(true));
+    else
+      runManager->SetUserInitialization(new LynxDetectorConstruction());
+  }
   else
-    runManager->SetUserInitialization(new PctDetectorConstruction(phName));
+      runManager->SetUserInitialization(new PctDetectorConstruction(phName, true));
 
   auto UImanager = G4UImanager::GetUIpointer();
   G4VisManager* vis = new G4VisExecutive(argc, argv);
   vis->Initialize();
 
   G4String execCommand = "/control/execute ";
-  if (!G4StrUtil::icompare(simMode, "pct") && macroFile.compare("init_vis.mac"))
+  if (macroFile.compare("init_vis.mac"))
   {
-
     UImanager->ApplyCommand("/run/initialize");
-    UImanager->ApplyCommand(execCommand + macroFile);
-    float newRotationArray[] = {0., 0., 1.};
-    float newEnergyArray[] = {200., 200., 1.};
-
-    if (rotationArray.size())
-      if (rotationArray.size() < 2)
-      {
-        newRotationArray[0] = rotationArray[0];
-        newRotationArray[1] = rotationArray[0];
-      }
-      else if (rotationArray.size() < 3)
-      {
-        newRotationArray[0] = rotationArray[0];
-        newRotationArray[1] = rotationArray[1];
-      }
-      else
-      {
-        newRotationArray[0] = rotationArray[0];
-        newRotationArray[1] = rotationArray[1];
-        newRotationArray[2] = rotationArray[2];
-      }
-
-    if (beamEnergyArray.size())
-      if (beamEnergyArray.size() < 2) 
-      {
-        newEnergyArray[0] = beamEnergyArray[0];
-        newEnergyArray[1] = beamEnergyArray[0];
-      }
-      else if (beamEnergyArray.size() < 3)
-      {
-        newEnergyArray[0] = beamEnergyArray[0];
-        newEnergyArray[1] = beamEnergyArray[1];
-      }
-      else
-      {
-        newEnergyArray[0] = beamEnergyArray[0];
-        newEnergyArray[1] = beamEnergyArray[1];
-        newEnergyArray[2] = beamEnergyArray[2];
-      }
-
-    for (float energy = newEnergyArray[0]; energy <= newEnergyArray[1];
-      energy += newEnergyArray[2])
+    if (!G4StrUtil::icompare(simMode, "pct"))
     {
-      for (float angle = newRotationArray[0]; angle <= newRotationArray[1];
-        angle += newRotationArray[2])
+      UImanager->ApplyCommand(execCommand + macroFile);
+      float newRotationArray[] = {0., 0., 1.};
+      float newEnergyArray[] = {200., 200., 1.};
+
+      if (rotationArray.size())
+        if (rotationArray.size() < 2)
+        {
+          newRotationArray[0] = rotationArray[0];
+          newRotationArray[1] = rotationArray[0];
+        }
+        else if (rotationArray.size() < 3)
+        {
+          newRotationArray[0] = rotationArray[0];
+          newRotationArray[1] = rotationArray[1];
+        }
+        else
+        {
+          newRotationArray[0] = rotationArray[0];
+          newRotationArray[1] = rotationArray[1];
+          newRotationArray[2] = rotationArray[2];
+        }
+
+      if (beamEnergyArray.size())
+        if (beamEnergyArray.size() < 2) 
+        {
+          newEnergyArray[0] = beamEnergyArray[0];
+          newEnergyArray[1] = beamEnergyArray[0];
+        }
+        else if (beamEnergyArray.size() < 3)
+        {
+          newEnergyArray[0] = beamEnergyArray[0];
+          newEnergyArray[1] = beamEnergyArray[1];
+        }
+        else
+        {
+          newEnergyArray[0] = beamEnergyArray[0];
+          newEnergyArray[1] = beamEnergyArray[1];
+          newEnergyArray[2] = beamEnergyArray[2];
+        }
+
+      for (float energy = newEnergyArray[0]; energy <= newEnergyArray[1];
+        energy += newEnergyArray[2])
       {
-        auto outputPath = createOutputDirs(energy, angle);
-        auto runOutputFileCmd = "/run/file/output " + outputPath;
-        auto rotatePhCmd = "/det/phantom/rotate/angle " + 
-          std::to_string(angle) + " deg";
-        auto beamEnergyCmd = "/gps/ene/mono " + std::to_string(energy) + " MeV";
-        auto beamRunCmd = "/run/beamOn " + numOfBeam;
-        UImanager->ApplyCommand(runOutputFileCmd);
-        UImanager->ApplyCommand(beamEnergyCmd);
-        UImanager->ApplyCommand(rotatePhCmd);
-        UImanager->ApplyCommand(beamRunCmd);
+        for (float angle = newRotationArray[0]; angle <= newRotationArray[1];
+          angle += newRotationArray[2])
+        {
+          auto outputPath = createOutputDirs(energy, angle);
+          auto runOutputFileCmd = "/run/file/output " + outputPath;
+          auto rotatePhCmd = "/det/phantom/rotate/angle " + 
+            std::to_string(angle) + " deg";
+          auto beamEnergyCmd = "/gps/ene/mono " + std::to_string(energy) + " MeV";
+          auto beamRunCmd = "/run/beamOn " + numOfBeam;
+
+          UImanager->ApplyCommand(runOutputFileCmd);
+          UImanager->ApplyCommand(beamEnergyCmd);
+          UImanager->ApplyCommand(rotatePhCmd);
+          UImanager->ApplyCommand(beamRunCmd);
+        }
+      }
+    }
+  }
+  if (!G4StrUtil::icompare(simMode, "lynx"))
+  {
+    UImanager->ApplyCommand(execCommand + "beam_kcmh.mac");
+    auto beamRunCmd = "/run/beamOn " + numOfBeam;
+    for (int layerID = 0; layerID < 6; layerID++)
+    {
+      auto outFileName = G4String("./output/lynx_") + std::to_string(layerID) +
+        G4String(".root");
+      auto runOutputFileCmd = "/run/file/output " + outFileName;
+      auto lynxChangePosCmd = "/det/lynx/posz " + std::to_string((layerID - 2)*10) +
+        G4String(".0 cm");
+      
+      UImanager->ApplyCommand(outFileName);
+      UImanager->ApplyCommand(lynxChangePosCmd);
+
+      for (int sigma_i = 0; sigma_i < 20; sigma_i++)
+      {
+        auto sigma = std::to_string(2.0 + 0.1*sigma_i) + G4String(" mm");
+        UImanager->ApplyCommand("/gps/pos/sigma_r " + sigma);
+        for (int sigma_ai = 0; sigma_ai < 100; sigma_ai++)
+        {
+          auto angleSigma = std::to_string(0.0001 + 0.0001*sigma_ai*50.) +
+            G4String(" rad");
+          UImanager->ApplyCommand("/gps/ang/sigma_r " + angleSigma);
+          UImanager->ApplyCommand("/run/lynx/beam/sigma " + sigma);
+          UImanager->ApplyCommand("/run/lynx/beam/sigma_r " + angleSigma);
+          UImanager->ApplyCommand("/run/lynx/init");
+          UImanager->ApplyCommand(beamRunCmd);
+          UImanager->ApplyCommand("/run/lynx/reset");
+        }
       }
     }
   }

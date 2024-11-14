@@ -1,6 +1,9 @@
 #ifndef ACTIONINITIALIZATION_HH
 #define ACTIONINITIALIZATION_HH 1
+
 #include "G4VUserActionInitialization.hh"
+
+class G4String;
 
 namespace kcmh
 {
@@ -8,7 +11,7 @@ namespace kcmh
     {
       public:
         ActionInitialization(G4String);
-        ~ActionInitialization() override{};
+        ~ActionInitialization();
 
         void Build() const override;
         void BuildForMaster() const override;

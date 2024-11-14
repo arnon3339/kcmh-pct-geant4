@@ -8,7 +8,10 @@ else()
   find_package(Geant4 REQUIRED)
 endif()
 
+find_package(Boost REQUIRED)
+
 include(${Geant4_USE_FILE})
+include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/include
  ${PROJECT_SOURCE_DIR}/phantom)
 
@@ -36,4 +39,4 @@ endforeach()
 
 add_definitions(-DPHANTOM_PATH="${PROJECT_SOURCE_DIR}/phantom")
 add_executable(pctKCMH pctKCMH.cc ${headers} ${sources})
-target_link_libraries(pctKCMH ${Geant4_LIBRARIES})
+target_link_libraries(pctKCMH ${Geant4_LIBRARIES} ${Boost_LIBRARIES})

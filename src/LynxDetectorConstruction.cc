@@ -18,24 +18,15 @@
 
 namespace kcmh
 {
-  LynxDetectorConstruction::LynxDetectorConstruction(G4String phName, G4bool isVis)
-  :fIsVis(isVis), detMessenger(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
+  LynxDetectorConstruction::LynxDetectorConstruction(G4bool isVis)
+  :fIsVis(isVis), detMessenger(0)
   {
-    if (phName.compare("none"))
-    {
-      ph = new PhantomConstruction(phName);
-      phanLog = ph->GetLogVolume();
-      detMessenger = new DetectorMessenger(this);
-      phAngle = 0. *deg;
-    }
+    
   }
 
   LynxDetectorConstruction::~LynxDetectorConstruction()
   {
     delete detMessenger;
-    delete ph;
-    delete phPhys;
-    delete envLog;
   }
 
   G4VPhysicalVolume* LynxDetectorConstruction::Construct()
@@ -43,8 +34,6 @@ namespace kcmh
     G4bool checkOverlaps = true;
     auto nist = G4NistManager::Instance();
     auto airMat = nist->FindOrBuildMaterial("G4_AIR");
-    auto siliconMat = nist->FindOrBuildMaterial("G4_Si");
-    auto aluminiumMat = nist->FindOrBuildMaterial("G4_Al");
     auto nonVis = new G4VisAttributes();
     nonVis->SetVisibility(false);
 
@@ -140,7 +129,7 @@ namespace kcmh
       worldSol, airMat, "worldLog"
     );
     worldLog->SetVisAttributes(nonVis);
-    envLog = new G4LogicalVolume(
+    auto envLog = new G4LogicalVolume(
       envSol, airMat, "envLog"
     );
     auto envVis = new G4VisAttributes();
@@ -161,27 +150,7 @@ namespace kcmh
     auto dtcLayerLog = new G4LogicalVolume(
       dtcLayerSol, airMat, "dtcLayerLog"
     );
-    dtcLayerLog->SetVisAttributes(nonVis);
-    auto alpideLog = new G4LogicalVolume(
-      alpdieSol, siliconMat, "alpideLog"
-    );
-    auto alpideVis = new G4VisAttributes();
-    alpideVis->SetColor(1, 0, 0, 1);
-    alpideLog->SetVisAttributes(alpideVis);
-    auto alpidePixelCircuitLog = new G4LogicalVolume(
-      alpidePixelCircuitSol, aluminiumMat, "alideCircuitLog"
-    );
-    alpidePixelCircuitLog->SetVisAttributes(nonVis);
-    auto alpidePixelEpiLog = new G4LogicalVolume(
-      alpidePixelEpiSol, siliconMat, "alpidePixelEpiLog"
-    );
-    alpidePixelEpiLog->SetVisAttributes(nonVis);
-    auto absorberLog = new G4LogicalVolume(
-      absorberSol, aluminiumMat, "absorberLog"
-    );
-    auto alpidePixelLog = new G4LogicalVolume(
-      alpidePixelSol, siliconMat, "alpidePixelLog"
-    );
+   
     auto alpidePixelRowLog = new G4LogicalVolume(
       alpidePixelRowSol, siliconMat, "alpidePixelRowLog"
     );
@@ -194,32 +163,7 @@ namespace kcmh
     );
     trackerFlexLog->SetVisAttributes(nonVis);
 
-    if (ph)
-    {
-      G4RotationMatrix* rMatrix = new G4RotationMatrix();
-      rMatrix->rotateY(phAngle);
-      phPhys = new G4PVPlacement(
-        rMatrix,
-        G4ThreeVector(0, 0, 0),
-        phanLog,
-        "phantomPhys",
-        envLog,
-        false,
-        0,
-        checkOverlaps
-      );
-    }
-
-    new G4PVPlacement(
-      nullptr,
-      absorberInDtcPos,
-      absorberLog,
-      "absorberPixelPhys",
-      dtcChipLog,
-      false,
-      0,
-      checkOverlaps
-    );
+   
     new G4PVPlacement(
       nullptr,
       alpidePixelCircuitInAlpidePos,

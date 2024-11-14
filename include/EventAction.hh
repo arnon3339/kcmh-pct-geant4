@@ -11,7 +11,7 @@ namespace kcmh
   class EventAction: public G4UserEventAction
   {
   public:
-    EventAction(const RunAction*);
+    EventAction(RunAction*);
     ~EventAction();
 
     void BeginOfEventAction(const G4Event*) override;
@@ -20,7 +20,7 @@ namespace kcmh
   private:
     G4int dtcTrackerID = -1;
     G4int lynxTrackerID = -1;
-    const RunAction* fRunAction;
+    RunAction* fRunAction;
     void collectDtcHits(const G4Event*);
     void collectLynxHits(const G4Event*);
   };
