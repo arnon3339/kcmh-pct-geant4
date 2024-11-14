@@ -1,4 +1,4 @@
-#include "TrackerSD.hh"
+#include "PctTrackerSD.hh"
 #include "G4HCofThisEvent.hh"
 #include "TrackerHit.hh"
 #include "G4SDManager.hh"
@@ -11,16 +11,16 @@
 
 namespace kcmh
 {
-  TrackerSD::TrackerSD(const G4String& name,
+  PctTrackerSD::PctTrackerSD(const G4String& name,
     const G4String& hitsCollectionName)
   :G4VSensitiveDetector(name)
   {
     collectionName.insert(hitsCollectionName);
   }
 
-  TrackerSD::~TrackerSD(){}
+  PctTrackerSD::~PctTrackerSD(){}
 
-  void TrackerSD::Initialize(G4HCofThisEvent* hce)
+  void PctTrackerSD::Initialize(G4HCofThisEvent* hce)
   {
     fHitsCollection = new TrackerHitsCollection(SensitiveDetectorName,
      collectionName[0]);
@@ -29,7 +29,7 @@ namespace kcmh
     hce->AddHitsCollection(hcID, fHitsCollection);
   }
 
-  G4bool TrackerSD::ProcessHits(G4Step* step, G4TouchableHistory* history)
+  G4bool PctTrackerSD::ProcessHits(G4Step* step, G4TouchableHistory* history)
   {
     auto newHit = new TrackerHit();
     G4Track* track = step->GetTrack();
@@ -70,7 +70,7 @@ namespace kcmh
     return true;
   }
 
-  void TrackerSD::EndOfEvent(G4HCofThisEvent* hce)
+  void PctTrackerSD::EndOfEvent(G4HCofThisEvent* hce)
   {
     if (verboseLevel == 1)
     {

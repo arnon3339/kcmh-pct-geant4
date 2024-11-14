@@ -6,21 +6,22 @@
 class G4UIdirectory;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcommand;
+class G4VUserDetectorConstruction;
 
 namespace kcmh
 {
-  class DetectorConstruction;
+  class PctDetectorConstruction;
   class DetectorMessenger: public G4UImessenger
     {
     private:
-      DetectorConstruction* fdet;
+      G4VUserDetectorConstruction* fdet;
       G4UIdirectory*              fDirectory;
       G4UIdirectory*              fPhDirectory;
       G4UIdirectory*              fRotPhDirectory;
       G4UIcmdWithADoubleAndUnit*  fSetPhAngleCmd;
 
     public:
-      DetectorMessenger(DetectorConstruction*);
+      DetectorMessenger(G4VUserDetectorConstruction*);
       ~DetectorMessenger();
 
       void SetNewValue(G4UIcommand*, G4String) override;

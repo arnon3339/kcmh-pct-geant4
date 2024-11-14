@@ -19,7 +19,10 @@ namespace kcmh
 
   private:
     G4int dtcTrackerID = -1;
+    G4int lynxTrackerID = -1;
     const RunAction* fRunAction;
+    void collectDtcHits(const G4Event*);
+    void collectLynxHits(const G4Event*);
   };
   
 } // namespace kcmh

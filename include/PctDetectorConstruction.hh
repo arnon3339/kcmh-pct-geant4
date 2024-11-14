@@ -1,5 +1,5 @@
-#ifndef DETECTORCONSTRUCTION_HH
-#define DETECTORCONSTRUCTION_HH 1
+#ifndef PCTDETECTORCONSTRUCTION_HH
+#define PCTDETECTORCONSTRUCTION_HH 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "phantomConstruction.hh"
@@ -10,11 +10,11 @@ namespace kcmh
 {
   class DetectorMessenger;
 
-  class DetectorConstruction: public G4VUserDetectorConstruction
+  class PctDetectorConstruction: public G4VUserDetectorConstruction
   {
     public:
-      DetectorConstruction(G4String, G4bool isVis=false);
-      ~DetectorConstruction() override;
+      PctDetectorConstruction(G4String, G4bool isVis=false);
+      ~PctDetectorConstruction() override;
 
       G4VPhysicalVolume* Construct() override;
       void ConstructSDandField() override;

@@ -10,7 +10,7 @@
 #include "G4LossTableManager.hh"
 #include "G4HadronPhysicsQGSP_BIC.hh"
 #include "G4SystemOfUnits.hh"
-#include "DetectorConstruction.hh"
+#include "PctDetectorConstruction.hh"
 #include "G4RegionStore.hh"
 
 namespace kcmh

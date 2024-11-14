@@ -1,15 +1,16 @@
 #include "DetectorMessenger.hh"
 
-#include "DetectorConstruction.hh"
+#include "PctDetectorConstruction.hh"
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcommand.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4VUserDetectorConstruction.hh"
 
 namespace kcmh
 {
-  DetectorMessenger::DetectorMessenger(DetectorConstruction* det)
+  DetectorMessenger::DetectorMessenger(G4VUserDetectorConstruction* det)
   :fdet(det), fDirectory(0), fPhDirectory(0), fRotPhDirectory(0),
   fSetPhAngleCmd(0)
   {
@@ -43,7 +44,7 @@ namespace kcmh
   {
     if( command == fSetPhAngleCmd ) {
       auto inputValue = fSetPhAngleCmd->GetNewDoubleValue(newValue);
-      fdet->RotatePhantom(inputValue);
+      dynamic_cast<PctDetectorConstruction*>(fdet)->RotatePhantom(inputValue);
     }
   }
 } // namespace kcmh

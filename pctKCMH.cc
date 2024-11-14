@@ -4,7 +4,7 @@
 #include "G4VisManager.hh"
 #include "G4VisExecutive.hh"
 #include "ActionInitialization.hh"
-#include "DetectorConstruction.hh"
+#include "PctDetectorConstruction.hh"
 #include "PhysicsList.hh"
 #include "argparse.hh"
 #include "utils.hh"
@@ -31,6 +31,11 @@ int main(int argc, char **argv)
   }
   
   argparse::ArgumentParser program("pctKCMH"); 
+
+  program.add_argument("--mode")
+  .help("Simulation mode")
+  .nargs(1)
+  .default_value("pct");
 
   program.add_argument("--macro", "-m")
   .help("The macro file")
@@ -67,6 +72,7 @@ int main(int argc, char **argv)
 
   program.parse_args(argc, argv);
 
+  auto simMode = program.get("--mode");
   auto macroFile = program.get("--macro");
   auto phName = program.get("--phantom");
   auto numOfThreads = program.get<int>("--thread");
@@ -82,18 +88,18 @@ int main(int argc, char **argv)
   runManager->SetNumberOfThreads(numOfThreads);
 
   runManager->SetUserInitialization(new PhysicsList());
-  runManager->SetUserInitialization(new ActionInitialization());
+  runManager->SetUserInitialization(new ActionInitialization(simMode));
   if (!macroFile.compare("init_vis.mac"))
-    runManager->SetUserInitialization(new DetectorConstruction(phName, true));
+    runManager->SetUserInitialization(new PctDetectorConstruction(phName, true));
   else
-    runManager->SetUserInitialization(new DetectorConstruction(phName));
+    runManager->SetUserInitialization(new PctDetectorConstruction(phName));
 
   auto UImanager = G4UImanager::GetUIpointer();
   G4VisManager* vis = new G4VisExecutive(argc, argv);
   vis->Initialize();
 
   G4String execCommand = "/control/execute ";
-  if (macroFile.compare("init_vis.mac"))
+  if (!G4StrUtil::icompare(simMode, "pct") && macroFile.compare("init_vis.mac"))
   {
 
     UImanager->ApplyCommand("/run/initialize");

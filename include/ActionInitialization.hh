@@ -7,11 +7,14 @@ namespace kcmh
     class ActionInitialization: public G4VUserActionInitialization
     {
       public:
-        ActionInitialization(){};
+        ActionInitialization(G4String);
         ~ActionInitialization() override{};
 
         void Build() const override;
         void BuildForMaster() const override;
+      
+      private:
+        int fSimMode = 0;
     };
 } // namespace kcmh
 #endif

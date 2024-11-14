@@ -3,13 +3,24 @@
 #include "PrimaryGeneratorAction.hh"
 #include "EventAction.hh"
 
+#include <string>
+
 namespace kcmh
 {
+  ActionInitialization::ActionInitialization(G4String mode)
+  {
+    if (!G4StrUtil::icompare(mode, "pct"))
+      fSimMode = 0;
+    else if ((!G4StrUtil::icompare(mode, "cal")) || 
+      (!G4StrUtil::icompare(mode, "lynx")))
+      fSimMode = 1;
+  }
+
   void ActionInitialization::Build() const
   {
     SetUserAction(new PrimaryGeneratorAction());
 
-    auto runAction = new RunAction();
+    auto runAction = new RunAction(fSimMode);
     SetUserAction(runAction);
 
     auto eventAction = new EventAction(runAction);
@@ -18,6 +29,6 @@ namespace kcmh
 
   void ActionInitialization::BuildForMaster() const
   {
-    SetUserAction(new RunAction());
+    SetUserAction(new RunAction(fSimMode));
   }
 } // namespace kcmh

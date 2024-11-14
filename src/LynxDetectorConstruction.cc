@@ -1,6 +1,6 @@
-#include "PctDetectorConstruction.hh"
+#include "LynxDetectorConstruction.hh"
 
-#include "PctTrackerSD.hh"
+#include "LynxTrackerSD.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
@@ -18,7 +18,7 @@
 
 namespace kcmh
 {
-  PctDetectorConstruction::PctDetectorConstruction(G4String phName, G4bool isVis)
+  LynxDetectorConstruction::LynxDetectorConstruction(G4String phName, G4bool isVis)
   :fIsVis(isVis), detMessenger(0), phanLog(0), phAngle(0), envLog(0), phPhys(0), ph(0)
   {
     if (phName.compare("none"))
@@ -30,7 +30,7 @@ namespace kcmh
     }
   }
 
-  PctDetectorConstruction::~PctDetectorConstruction()
+  LynxDetectorConstruction::~LynxDetectorConstruction()
   {
     delete detMessenger;
     delete ph;
@@ -38,7 +38,7 @@ namespace kcmh
     delete envLog;
   }
 
-  G4VPhysicalVolume* PctDetectorConstruction::Construct()
+  G4VPhysicalVolume* LynxDetectorConstruction::Construct()
   {
     G4bool checkOverlaps = true;
     auto nist = G4NistManager::Instance();
@@ -357,24 +357,11 @@ namespace kcmh
     );
   }
 
-  void PctDetectorConstruction::ConstructSDandField()
+  void LynxDetectorConstruction::ConstructSDandField()
   {
-    G4String dtcSDName = "/DTC";
-    auto dtcSD = new PctTrackerSD(dtcSDName, "dtcHitsCollection");
+    G4String dtcSDName = "/Lynx";
+    auto dtcSD = new LynxTrackerSD(dtcSDName, "LynxHitsCollection");
     G4SDManager::GetSDMpointer()->AddNewDetector(dtcSD);    
     SetSensitiveDetector("alpidePixelEpiLog", dtcSD, true);
   }
-
-  void PctDetectorConstruction::RotatePhantom(const G4double& angle)
-  {
-    phAngle = angle;
-    auto rMatrix = new G4RotationMatrix();
-    rMatrix->rotateY(phAngle);
-
-    phPhys->SetRotation(rMatrix);
-
-    auto runManager = G4RunManager::GetRunManager();
-    runManager->GeometryHasBeenModified();
-  }
-
 } // namespace kcmh

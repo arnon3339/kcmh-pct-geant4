@@ -23,9 +23,22 @@ namespace kcmh
   {
     dtcTrackerID = G4SDManager::GetSDMpointer()->
       GetCollectionID("dtcHitsCollection");
+
+    lynxTrackerID = G4SDManager::GetSDMpointer()->
+      GetCollectionID("dtcHitsCollection");
   }
 
   void EventAction::EndOfEventAction(const G4Event* event)
+  {
+    if (dtcTrackerID < 0 && lynxTrackerID < 0) return;
+
+    if (dtcTrackerID > 0)
+      collectDtcHits(event);
+    else if (lynxTrackerID > 0)
+      collectLynxHits(event);
+  }
+
+  void EventAction::collectDtcHits(const G4Event* event)
   {
     auto dtcDistance = 25. *mm;
     auto alpideSizeX = 30. *mm;
@@ -36,7 +49,6 @@ namespace kcmh
     auto pixelSizeY = alpideSizeY/numPixelsYInAlpide;
 
     auto analysisManager = G4AnalysisManager::Instance();
-    if (dtcTrackerID < 0) return;
 
     auto hce = event->GetHCofThisEvent();
     TrackerHitsCollection* DTC = nullptr;
@@ -102,5 +114,10 @@ namespace kcmh
       analysisManager->FillNtupleIColumn(9, (*DTC)[i]->GetPDGEncoding());
       analysisManager->AddNtupleRow();
     }
+  }
+
+  void EventAction::collectLynxHits(const G4Event* event)
+  {
+
   }
 } // namespace kcmh

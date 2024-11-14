@@ -14,8 +14,9 @@ namespace kcmh
   {
     private:
       const RunActionMessenger* fRunActionMessenger;
+      const G4int fSimMode;
     public:
-      RunAction();
+      RunAction(const G4int);
       ~RunAction() override;
 
       void BeginOfRunAction(const G4Run*) override;
