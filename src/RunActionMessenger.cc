@@ -40,7 +40,7 @@ namespace kcmh
     fBeamDirectory->SetGuidance("Run action control for beam lynx");
 
     fLabelBeamSigma
-      = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma",this);
+      = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_r",this);
     fLabelBeamSigma->SetGuidance("Input the beam sigma (mm) for lynx beam.");
     fLabelBeamSigma->SetParameterName("Sigma(mm)", false);
     fLabelBeamSigma->SetDefaultValue(0. *mm);
@@ -48,11 +48,11 @@ namespace kcmh
     fLabelBeamSigma->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
     fLabelBeamSigmaR
-      = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_r",this);
-    fLabelBeamSigmaR->SetGuidance("Input the beam angle sigma (rad) for lynx beam.");
-    fLabelBeamSigmaR->SetParameterName("Sigma(rad)", false);
-    fLabelBeamSigmaR->SetDefaultValue(0. *rad);
-    fLabelBeamSigmaR->SetDefaultUnit("rad");
+      = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_a",this);
+    fLabelBeamSigmaR->SetGuidance("Input the beam angle sigma (degree) for lynx beam.");
+    fLabelBeamSigmaR->SetParameterName("Sigma(deg)", false);
+    fLabelBeamSigmaR->SetDefaultValue(0.0001 *deg);
+    fLabelBeamSigmaR->SetDefaultUnit("deg");
     fLabelBeamSigmaR->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
   }

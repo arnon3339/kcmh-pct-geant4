@@ -65,6 +65,12 @@ int main(int argc, char **argv)
   .default_value(std::vector<float>{})
   .action([](const std::string& value) { return std::stof(value); });
 
+  program.add_argument("--cal")
+  .help("Calculate KCMH beam profile.")
+  .nargs(3)
+  .default_value(std::vector<float>{})
+  .action([](const std::string& value) { return std::stof(value); });
+
   program.add_argument("--thread", "-t")
   .help("The number of threads")
   .nargs(1)
@@ -80,6 +86,7 @@ int main(int argc, char **argv)
   auto numOfBeam = program.get("--beam");
   auto beamEnergyArray = program.get<std::vector<float>>("--energy");
   auto rotationArray = program.get<std::vector<float>>("--rotate");
+  auto calArray = program.get<std::vector<float>>("--cal");
 
   G4UIExecutive* ui = nullptr;
   if (!macroFile.compare("init_vis.mac")) ui = new G4UIExecutive(argc, argv);
@@ -182,7 +189,56 @@ int main(int argc, char **argv)
   if (!G4StrUtil::icompare(simMode, "lynx"))
   {
     UImanager->ApplyCommand(execCommand + "beam_kcmh.mac");
-    auto beamRunCmd = "/run/beamOn " + numOfBeam;
+    // auto beamRunCmd = "/run/beamOn " + numOfBeam;
+    for (int layerID = 0; layerID < 6; layerID++)
+    {
+      switch (calArray.size())
+      {
+        case 0:
+          UImanager->ApplyCommand("/gps/ang/sigma_r 0.0001 deg");
+          UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
+          UImanager->ApplyCommand("/run/lynx/beam/sigma_a 0.0001 deg");
+          UImanager->ApplyCommand("/run/lynx/beam/sigma_e 0.1 MeV");
+          for (int sigma_i = 0; sigma_i < 100; sigma_i++)
+          {
+            auto sigma = std::to_string(2.0 + (2.0/100)*sigma_i) + G4String(" mm");
+            UImanager->ApplyCommand("/gps/pos/sigma_r " + sigma);
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_r " + sigma);
+          }
+          break;
+
+        case 1:
+          UImanager->ApplyCommand("/gps/pos/sigma_r " +
+            std::to_string(calArray[0]) + " mm");
+          for (int sigma_ai = 0; sigma_ai < 100; sigma_ai++)
+          {
+            auto angleSigma = std::to_string(0.0001 + (0.1 - 0.0001)*sigma_ai/100) +
+              G4String(" deg");
+            UImanager->ApplyCommand("/gps/ang/sigma_r " + angleSigma);
+          }
+          break;
+
+        case 2:
+          UImanager->ApplyCommand("/gps/pos/sigma_r " +
+            std::to_string(calArray[0]) + " mm");
+          UImanager->ApplyCommand("/gps/ang/sigma_r " + 
+            std::to_string(calArray[1]) + " deg");
+          for (int sigma_ei = 0; sigma_ei < 100; sigma_ei++)
+          {
+            auto energySigma = std::to_string(sigma_ei/100) + G4String(" MeV");
+            UImanager->ApplyCommand("/gps/ene/sigma " + energySigma);
+          }
+          break;
+        
+        default:
+          for (int sigma_i = 0; sigma_i < 100; sigma_i++)
+          {
+            auto sigma = std::to_string(2.0 + (2.0/100)*sigma_i) + G4String(" mm");
+            UImanager->ApplyCommand("/gps/pos/sigma_r " + sigma);
+          }
+          break;
+      }
+    }
     for (int layerID = 0; layerID < 6; layerID++)
     {
       auto outFileName = G4String("./output/lynx_") + std::to_string(layerID) +
@@ -203,8 +259,6 @@ int main(int argc, char **argv)
           auto angleSigma = std::to_string(0.0001 + 0.0001*sigma_ai*50.) +
             G4String(" rad");
           UImanager->ApplyCommand("/gps/ang/sigma_r " + angleSigma);
-          UImanager->ApplyCommand("/run/lynx/beam/sigma " + sigma);
-          UImanager->ApplyCommand("/run/lynx/beam/sigma_r " + angleSigma);
           UImanager->ApplyCommand("/run/lynx/init");
           UImanager->ApplyCommand(beamRunCmd);
           UImanager->ApplyCommand("/run/lynx/reset");
