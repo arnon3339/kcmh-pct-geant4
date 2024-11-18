@@ -24,29 +24,26 @@ namespace kcmh
     fOutputFileCmd->SetParameterName("output file", false);
     fOutputFileCmd->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
-    fFileDirectory = new G4UIdirectory("/run/lynx/");
-    fFileDirectory->SetGuidance("Run action control for lynx");
+    fCloseOutFile
+      = new G4UIcmdWithoutParameter("/run/file/close",this);
+    fCloseOutFile->SetGuidance("Close output file");
+    fCloseOutFile->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
-    fInitLynx 
-      = new G4UIcmdWithoutParameter("/run/lynx/init",this);
-    fInitLynx->SetGuidance("Initialize lynx accumulators");
-    fInitLynx->AvailableForStates(G4State_PreInit,G4State_Idle);    
-
-    fResetLynx 
-      = new G4UIcmdWithoutParameter("/run/lynx/reset",this);
-    fResetLynx->SetGuidance("Reset lynx accumulators");
-    fResetLynx->AvailableForStates(G4State_PreInit,G4State_Idle);
-
-    fCalLynx 
-      = new G4UIcmdWithoutParameter("/run/lynx/cal",this);
-    fCalLynx->SetGuidance("Cal lynx accumulators");
-    fCalLynx->AvailableForStates(G4State_PreInit,G4State_Idle);
+    fLynxDirectory = new G4UIdirectory("/run/lynx/");
+    fLynxDirectory->SetGuidance("Run action control for lynx");
 
     fBeamDirectory = new G4UIdirectory("/run/lynx/beam/");
     fBeamDirectory->SetGuidance("Run action control for beam lynx");
 
     fDetDirectory = new G4UIdirectory("/run/lynx/det/");
     fDetDirectory->SetGuidance("Run action control for detector lynx");
+
+    fLabelDetLayer
+      = new G4UIcmdWithAnInteger("/run/lynx/det/layerID",this);
+    fLabelDetLayer->SetGuidance("Input the layerID for lynx detector.");
+    fLabelDetLayer->SetParameterName("Layer ID", false);
+    fLabelDetLayer->SetDefaultValue(0);
+    fLabelDetLayer->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
     fLabelBeamSigma
       = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_r",this);
@@ -79,16 +76,14 @@ namespace kcmh
     delete fRunDirectory;
     delete fFileDirectory;
     delete fOutputFileCmd;
-    delete fLynxDirectory;
-    delete fInitLynx;
-    delete fResetLynx;
     delete fBeamDirectory;
     delete fLabelBeamSigma;
     delete fLabelBeamSigmaR;
     delete fLabelBeamSigmaE;
     delete fDetDirectory;
+    delete fLynxDirectory;
     delete fLabelDetLayer;
-    delete fCalLynx;
+    delete fCloseOutFile;
   }
 
   void RunActionMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
@@ -96,21 +91,6 @@ namespace kcmh
     if (command == fOutputFileCmd)
     {
       fRunAction->OpenOutputFile(newValue);
-    }
-
-    if (command == fCalLynx)
-    {
-      fRunAction->CalLynx();
-    }
-
-    if (command == fInitLynx)
-    {
-      fRunAction->InitLynxAcc();
-    }
-
-    if (command == fResetLynx)
-    {
-      fRunAction->ResetLynxAcc();
     }
 
     if (command == fLabelBeamSigma)
@@ -129,6 +109,11 @@ namespace kcmh
     {
       auto inputValue = fLabelDetLayer->GetNewIntValue(newValue);
       fRunAction->SetLabeledDetLayer(inputValue);
+    }
+
+    if (command == fCloseOutFile)
+    {
+      fRunAction->CloseOutFile();
     }
   }
 } // namespace kchm

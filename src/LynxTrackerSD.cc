@@ -37,6 +37,19 @@ namespace kcmh
     if (track->GetParentID() != 0) return true;
     if (edep < 3.6 *eV) return true;
 
+
+    newHit->SetEdep(edep);
+    newHit->SetK(step->GetPreStepPoint()->GetKineticEnergy());
+    newHit->SetLayerID(0);
+    newHit->SetParentID(track->GetParentID());
+    newHit->SetPDGEncoding(track->GetParticleDefinition()->GetPDGEncoding());
+    newHit->SetTrackID(step->GetTrack()->GetTrackID());
+    newHit->SetPixels(
+      step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(),
+      step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(1)
+    );
+    fHitsCollection->insert(newHit);
+
     return true;
   }
 

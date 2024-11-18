@@ -23,7 +23,7 @@ namespace kcmh
 {
   RunAction::RunAction(const G4int simMode)
   : fRunActionMessenger(new RunActionMessenger(this)), fSimMode(simMode),
-  beamSigma(0), beamSigmaR(0)
+  fLayerID(0), fBeamSigma(0), fBeamSigmaA(0), fBeamSigmaE(0)
   {
 
     auto analysisManager = G4AnalysisManager::Instance(); 
@@ -53,6 +53,23 @@ namespace kcmh
       analysisManager->CreateNtupleIColumn("PDGe");
       analysisManager->FinishNtuple();
     }
+    else if (simMode == 1)
+    {
+      analysisManager->CreateNtuple("LYNX", "Lynx Hits");
+      analysisManager->CreateNtupleIColumn("eventID");
+      analysisManager->CreateNtupleIColumn("pixelX");
+      analysisManager->CreateNtupleIColumn("pixelY");
+      analysisManager->CreateNtupleIColumn("layerID");
+      analysisManager->CreateNtupleDColumn("K");
+      analysisManager->CreateNtupleDColumn("edep");
+      analysisManager->CreateNtupleDColumn("sigma");
+      analysisManager->CreateNtupleDColumn("sigmaA");
+      analysisManager->CreateNtupleDColumn("sigmaE");
+      analysisManager->CreateNtupleIColumn("trackID");
+      analysisManager->CreateNtupleIColumn("parentID");
+      analysisManager->CreateNtupleIColumn("PDGe");
+      analysisManager->FinishNtuple();
+    }
   }
 
   RunAction::~RunAction()
@@ -68,6 +85,13 @@ namespace kcmh
     analysisManager->OpenFile(outputFile);
   }
 
+  void RunAction::CloseOutFile()
+  {
+      auto analysisManager = G4AnalysisManager::Instance();
+      analysisManager->Write();  // Write all histograms to file
+      analysisManager->CloseFile();  // Close the ROOT file
+  }
+
   void RunAction::EndOfRunAction(const G4Run*)
   {
     if (fSimMode == 0)
@@ -76,36 +100,5 @@ namespace kcmh
       analysisManager->Write();  // Write all histograms to file
       analysisManager->CloseFile();  // Close the ROOT file
     }
-  }
-
-  void RunAction::InitLynxAcc()
-  {
-    for (int i = 0; i < 6; i++)
-    {
-      fAccX[i] = std::make_unique<accumulator_set<double,
-        features<tag::mean, tag::variance>>>();
-      fAccY[i] = std::make_unique<accumulator_set<double,
-        features<tag::mean, tag::variance>>>();
-    }
-  }
-
-  void RunAction::ResetLynxAcc()
-  {
-    for (int i = 0; i < 6; i++)
-    {
-      fAccX[i].reset();
-      fAccY[i].reset();
-    }
-  }
-
-  void RunAction::AddAccValues(G4int* xy)
-  {
-    (*fAccX[fLayerID])(xy[0]);
-    (*fAccY[fLayerID])(xy[1]);
-  }
-
-  void RunAction::CalLynx()
-  {
-
   }
 } // namespace kcmh

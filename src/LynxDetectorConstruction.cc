@@ -102,7 +102,7 @@ namespace kcmh
     );
 
     new G4PVReplica(
-      "trackerRowPhys",
+      "pixelPhys",
       pixelLog,
       trackerRowLog,
       kXAxis,

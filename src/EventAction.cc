@@ -21,20 +21,26 @@ namespace kcmh
 
   void EventAction::BeginOfEventAction(const G4Event*)
   {
-    dtcTrackerID = G4SDManager::GetSDMpointer()->
-      GetCollectionID("dtcHitsCollection");
-
-    lynxTrackerID = G4SDManager::GetSDMpointer()->
-      GetCollectionID("LynxHitsCollection");
+    auto sdManager = G4SDManager::GetSDMpointer();
+    const auto numOfSds = sdManager->GetHCtable()->entries();
+    
+    for (int i = 0; i < numOfSds; i++)
+    {
+      if (!sdManager->GetHCtable()->GetHCname(i).compare("dtcHitsCollection"))
+        dtcTrackerID = sdManager->GetCollectionID("dtcHitsCollection");
+      else if (!sdManager->GetHCtable()->GetHCname(i).compare("LynxHitsCollection"))
+        lynxTrackerID = G4SDManager::GetSDMpointer()->
+          GetCollectionID("LynxHitsCollection");
+    }
   }
 
   void EventAction::EndOfEventAction(const G4Event* event)
   {
     if (dtcTrackerID < 0 && lynxTrackerID < 0) return;
 
-    if (dtcTrackerID > 0)
+    if (dtcTrackerID >= 0)
       collectDtcHits(event);
-    else if (lynxTrackerID > 0)
+    else if (lynxTrackerID >= 0)
       collectLynxHits(event);
   }
 
@@ -121,11 +127,23 @@ namespace kcmh
     auto hce = event->GetHCofThisEvent();
     TrackerHitsCollection* LYNX = nullptr;
 
-    if (hce) LYNX = (TrackerHitsCollection*)hce->GetHC(dtcTrackerID);
+    if (hce) LYNX = (TrackerHitsCollection*)hce->GetHC(lynxTrackerID);
 
     for (size_t i = 0; i < LYNX->GetSize(); i++)
     {
-      fRunAction->AddAccValues((*LYNX)[i]->GetPixels());
+      analysisManager->FillNtupleIColumn(0, event->GetEventID());
+      analysisManager->FillNtupleIColumn(1, (*LYNX)[i]->GetPixels()[0]);
+      analysisManager->FillNtupleIColumn(2, (*LYNX)[i]->GetPixels()[1]);
+      analysisManager->FillNtupleIColumn(3, fRunAction->GetLabeledDetLayerID());
+      analysisManager->FillNtupleDColumn(4, (*LYNX)[i]->GetK());
+      analysisManager->FillNtupleDColumn(5, (*LYNX)[i]->GetEdep());
+      analysisManager->FillNtupleDColumn(6, fRunAction->GetLabeledBeamSigma());
+      analysisManager->FillNtupleDColumn(7, fRunAction->GetLabeledBeamSigmaR());
+      analysisManager->FillNtupleDColumn(8, fRunAction->GetLabeledBeamSigmaE());
+      analysisManager->FillNtupleIColumn(9, (*LYNX)[i]->GetTrackID());
+      analysisManager->FillNtupleIColumn(10, (*LYNX)[i]->GetParentID());
+      analysisManager->FillNtupleIColumn(11, (*LYNX)[i]->GetPDGEncoding());
+      analysisManager->AddNtupleRow();
     }
   }
 } // namespace kcmh

@@ -26,9 +26,6 @@ private:
   G4UIcmdWithAString* fOutputFileCmd;
 
   G4UIdirectory*      fLynxDirectory;
-  G4UIcmdWithoutParameter* fResetLynx;
-  G4UIcmdWithoutParameter* fInitLynx;
-  G4UIcmdWithoutParameter* fCalLynx;
 
   G4UIdirectory*      fBeamDirectory;
   G4UIdirectory*      fDetDirectory;
@@ -38,6 +35,8 @@ private:
   G4UIcmdWithADoubleAndUnit* fLabelBeamSigmaE;
 
   G4UIcmdWithAnInteger* fLabelDetLayer;
+
+  G4UIcmdWithoutParameter* fCloseOutFile;
 
 public:
   RunActionMessenger(RunAction*);

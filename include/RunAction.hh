@@ -20,30 +20,10 @@ namespace kcmh
     private:
       const RunActionMessenger* fRunActionMessenger;
       const G4int fSimMode;
-      G4int fLayerID = 0;
-      G4double beamSigma;
-      G4double beamSigmaR;
-
-      std::unique_ptr<boost::accumulators::accumulator_set<double,
-      boost::accumulators::features<boost::accumulators::tag::mean,
-      boost::accumulators::tag::variance>>> fAccX[6];
-
-      std::unique_ptr<boost::accumulators::accumulator_set<double,
-      boost::accumulators::features<boost::accumulators::tag::mean,
-      boost::accumulators::tag::variance>>> fAccY[6];
-
-      double sigmaErrs[6] = {
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-      };
-
-      // std::unique_ptr<boost::accumulators::accumulator_set<double,
-      // boost::accumulators::features<boost::accumulators::tag::mean,
-      // boost::accumulators::tag::variance>>> fAccY;
+      G4int fLayerID;
+      G4double fBeamSigma;
+      G4double fBeamSigmaA;
+      G4double fBeamSigmaE;
 
     public:
       RunAction(const G4int);
@@ -53,19 +33,17 @@ namespace kcmh
       void EndOfRunAction(const G4Run*) override;
 
       void OpenOutputFile(const G4String&);
+      void CloseOutFile();
 
-      void CalLynx();
-      void ResetLynxAcc();
-      void InitLynxAcc();
-
-      void AddAccValues(G4int*);
-
-      void SetLabeledBeamSigma(G4double sigma) { beamSigma = sigma; };
-      void SetLabeledBeamSigmaR(G4double sigmaR) { beamSigmaR = sigmaR; };
+      void SetLabeledBeamSigma(G4double sigma) { fBeamSigma = sigma; };
+      void SetLabeledBeamSigmaR(G4double sigmaR) { fBeamSigmaA = sigmaR; };
+      void SetLabeledBeamSigmaE(G4double sigmaE) { fBeamSigmaE = sigmaE; };
       void SetLabeledDetLayer(G4int layerID) { fLayerID = layerID; };
 
-      G4double GetLabeledBeamSigma() { return beamSigma; };
-      G4double GetLabeledBeamSigmaR() { return beamSigmaR; };
+      G4double GetLabeledBeamSigma() { return fBeamSigma; };
+      G4double GetLabeledBeamSigmaR() { return fBeamSigmaA; };
+      G4double GetLabeledBeamSigmaE() { return fBeamSigmaE; };
+      G4int GetLabeledDetLayerID() { return fLayerID; };
   };
 } // namespace kcmh
 
