@@ -18,11 +18,12 @@ namespace kcmh
 
       G4VPhysicalVolume* Construct() override;
       void ConstructSDandField() override;
-      void SetPosZ(const G4int);
+      void SetPosZ(const G4double);
 
     private:
       G4double fZPos;
       G4bool fIsVis;
+      G4VPhysicalVolume* trackerPhys;
       DetectorMessenger* detMessenger;
   };
 } // namespace kcmh

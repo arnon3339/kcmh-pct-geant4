@@ -3,6 +3,7 @@
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcommand.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -34,10 +35,18 @@ namespace kcmh
     fResetLynx 
       = new G4UIcmdWithoutParameter("/run/lynx/reset",this);
     fResetLynx->SetGuidance("Reset lynx accumulators");
-    fResetLynx->AvailableForStates(G4State_PreInit,G4State_Idle);    
+    fResetLynx->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-    fBeamDirectory = new G4UIdirectory("/run/lynx/beam");
+    fCalLynx 
+      = new G4UIcmdWithoutParameter("/run/lynx/cal",this);
+    fCalLynx->SetGuidance("Cal lynx accumulators");
+    fCalLynx->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+    fBeamDirectory = new G4UIdirectory("/run/lynx/beam/");
     fBeamDirectory->SetGuidance("Run action control for beam lynx");
+
+    fDetDirectory = new G4UIdirectory("/run/lynx/det/");
+    fDetDirectory->SetGuidance("Run action control for detector lynx");
 
     fLabelBeamSigma
       = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_r",this);
@@ -55,6 +64,14 @@ namespace kcmh
     fLabelBeamSigmaR->SetDefaultUnit("deg");
     fLabelBeamSigmaR->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
+    fLabelBeamSigmaE
+      = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_e",this);
+    fLabelBeamSigmaE->SetGuidance("Input the beam energy sigma (MeV) for lynx beam.");
+    fLabelBeamSigmaE->SetParameterName("Sigma(MeV)", false);
+    fLabelBeamSigmaE->SetDefaultValue(0.1 *MeV);
+    fLabelBeamSigmaE->SetDefaultUnit("MeV");
+    fLabelBeamSigmaE->AvailableForStates(G4State_PreInit,G4State_Idle);    
+
   }
 
   RunActionMessenger::~RunActionMessenger()
@@ -68,6 +85,10 @@ namespace kcmh
     delete fBeamDirectory;
     delete fLabelBeamSigma;
     delete fLabelBeamSigmaR;
+    delete fLabelBeamSigmaE;
+    delete fDetDirectory;
+    delete fLabelDetLayer;
+    delete fCalLynx;
   }
 
   void RunActionMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
@@ -75,6 +96,11 @@ namespace kcmh
     if (command == fOutputFileCmd)
     {
       fRunAction->OpenOutputFile(newValue);
+    }
+
+    if (command == fCalLynx)
+    {
+      fRunAction->CalLynx();
     }
 
     if (command == fInitLynx)
@@ -97,6 +123,12 @@ namespace kcmh
     {
       auto inputValue = fLabelBeamSigmaR->GetNewDoubleValue(newValue);
       fRunAction->SetLabeledBeamSigmaR(inputValue);
+    }
+
+    if (command == fLabelDetLayer)
+    {
+      auto inputValue = fLabelDetLayer->GetNewIntValue(newValue);
+      fRunAction->SetLabeledDetLayer(inputValue);
     }
   }
 } // namespace kchm

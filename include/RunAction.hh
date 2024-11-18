@@ -20,16 +20,30 @@ namespace kcmh
     private:
       const RunActionMessenger* fRunActionMessenger;
       const G4int fSimMode;
+      G4int fLayerID = 0;
       G4double beamSigma;
       G4double beamSigmaR;
 
       std::unique_ptr<boost::accumulators::accumulator_set<double,
       boost::accumulators::features<boost::accumulators::tag::mean,
-      boost::accumulators::tag::variance>>> fAccX;
+      boost::accumulators::tag::variance>>> fAccX[6];
 
       std::unique_ptr<boost::accumulators::accumulator_set<double,
       boost::accumulators::features<boost::accumulators::tag::mean,
-      boost::accumulators::tag::variance>>> fAccY;
+      boost::accumulators::tag::variance>>> fAccY[6];
+
+      double sigmaErrs[6] = {
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+      };
+
+      // std::unique_ptr<boost::accumulators::accumulator_set<double,
+      // boost::accumulators::features<boost::accumulators::tag::mean,
+      // boost::accumulators::tag::variance>>> fAccY;
 
     public:
       RunAction(const G4int);
@@ -40,6 +54,7 @@ namespace kcmh
 
       void OpenOutputFile(const G4String&);
 
+      void CalLynx();
       void ResetLynxAcc();
       void InitLynxAcc();
 
@@ -47,6 +62,7 @@ namespace kcmh
 
       void SetLabeledBeamSigma(G4double sigma) { beamSigma = sigma; };
       void SetLabeledBeamSigmaR(G4double sigmaR) { beamSigmaR = sigmaR; };
+      void SetLabeledDetLayer(G4int layerID) { fLayerID = layerID; };
 
       G4double GetLabeledBeamSigma() { return beamSigma; };
       G4double GetLabeledBeamSigmaR() { return beamSigmaR; };

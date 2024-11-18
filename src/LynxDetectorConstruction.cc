@@ -37,50 +37,38 @@ namespace kcmh
     auto nonVis = new G4VisAttributes();
     nonVis->SetVisibility(false);
 
+    // Define elements
+    G4Element* H = nist->FindOrBuildElement("H");
+    G4Element* C = nist->FindOrBuildElement("C");
+    G4Element* O = nist->FindOrBuildElement("O");
+    G4Element* Gd = nist->FindOrBuildElement("Gd");
+    
+    // Define polystyrene (C8H8)n as the plastic base
+    G4Material* polystyrene = new G4Material("Polystyrene", 1.06*g/cm3, 2);
+    polystyrene->AddElement(C, 8);
+    polystyrene->AddElement(H, 8);
+
+    // Define gadolinium oxide (Gd2O3)
+    G4Material* gadoliniumOxide = new G4Material("Gd2O3", 7.41*g/cm3, 2);
+    gadoliniumOxide->AddElement(Gd, 2);
+    gadoliniumOxide->AddElement(O, 3);
+
+    // Define the gadolinium-based plastic scintillator material
+    // Here we assume 5% gadolinium oxide by weight in the plastic
+    G4double polystyreneFraction = 0.95;
+    G4double gadoliniumOxideFraction = 0.05;
+
+    G4Material* GdPlasticScintillator = new G4Material("GdPlasticScintillator", 1.06*g/cm3, 2);
+    GdPlasticScintillator->AddMaterial(polystyrene, polystyreneFraction);
+    GdPlasticScintillator->AddMaterial(gadoliniumOxide, gadoliniumOxideFraction);
+
+    // Geometry
+    G4int numOfPixels = 600;
     G4double envSizeXY = 30. *cm;
     G4double envSizeZ = 4. *m;
-
-    G4int numAlpideCol = 9;
-    G4int numAlpideRow = 12;
-    G4int numOfDtcLayer = 42;
-    G4int numOfPixelRow = 1024;
-    G4int numOfPixelCol = 512;
-    G4double alpideSizeX = 3. *cm;
-    G4double alpideSizeY = 1.38 *cm;
-    G4double alpidePixelSizeX = alpideSizeX/numOfPixelRow;
-    G4double alpidePixelSizeY = alpideSizeY/numOfPixelCol;
-    G4double alpideSizeZ = 50. *um;
-    G4double alpidePixelCircuitSizeZ = 11. *um;
-    G4double alpidePixelEpiSizeZ = 25. *um;
-    G4double absorberSizeZ = 3.5 *mm;
-    G4double absorberSizeX = alpideSizeX;
-    G4double absorberSizeY = alpideSizeY;
-    G4double absorberGapSizeZ = 4. *mm;
-    G4double dtcLayerDis = 2.5 *cm;
-    G4double detSizeX = alpideSizeX*numAlpideCol;
-    G4double detSizeY = alpideSizeY*numAlpideRow;
-    G4double dtcSizeZ = dtcLayerDis*numOfDtcLayer;
-    G4double phSizeXY = 30. *cm;
-    G4double phSizeZ = 30. *cm;
-    G4double phToTrackerSizeZ = 2.5 *cm;
-
-    auto trackerPos = G4ThreeVector(0, 0,
-      phSizeZ/2 + phToTrackerSizeZ + alpideSizeZ/2
-    );
-    auto dtcPos = G4ThreeVector(0, 0, 
-      phSizeZ/2 + phToTrackerSizeZ + alpideSizeZ/2 + dtcLayerDis + dtcSizeZ/2);
-    auto absorberInDtcPos = G4ThreeVector(
-      0, 0, (-dtcLayerDis/2) + alpideSizeZ + absorberGapSizeZ + absorberSizeZ/2
-    );
-    auto alpideInDtcPos = G4ThreeVector(
-      0, 0, (-dtcLayerDis/2) + alpideSizeZ/2
-    );
-    auto alpidePixelCircuitInAlpidePos = G4ThreeVector(
-      0, 0, (-alpideSizeZ/2) + alpidePixelCircuitSizeZ/2
-    );
-    auto alpidePixelEpiInAlpidePos = G4ThreeVector(
-      0, 0, (-alpideSizeZ/2) + alpidePixelCircuitSizeZ + alpidePixelEpiSizeZ/2
-    );
+    G4double detSizeXY = 300. *mm; 
+    G4double detSizeZ = 0.4 *mm;
+    G4double pixelSizeXY = detSizeXY/numOfPixels;
 
     auto worldSol = new G4Box(
       "worldSol", 1.2*envSizeXY/2, 1.2*envSizeXY/2, 1.2*envSizeZ/2
@@ -88,43 +76,13 @@ namespace kcmh
     auto envSol = new G4Box(
       "envSol", envSizeXY/2, envSizeXY/2, envSizeZ/2
     );
-    auto dtcChipSol = new G4Box(
-      "dtcChipSol", alpideSizeX/2, alpideSizeY/2, dtcLayerDis/2
-    );
-    auto dtcChipXSol = new G4Box(
-      "dtcChipXSol", detSizeX/2, alpideSizeY/2, dtcLayerDis/2
-    );
-    auto dtcChipYSol = new G4Box(
-      "dtcChipYSol", detSizeX/2, detSizeY/2, dtcLayerDis/2
-    );
-    auto dtcLayerSol = new G4Box(
-      "dtcLayerSol", detSizeX/2, detSizeY/2, dtcSizeZ/2
-    );
-    auto alpdieSol = new G4Box(
-      "alpideSol", alpideSizeX/2, alpideSizeY/2, alpideSizeZ/2
-    );
-    auto absorberSol = new G4Box(
-      "absorberSol", absorberSizeX/2, absorberSizeY/2, absorberSizeZ/2
-    );
-    auto trackerSol = new G4Box(
-      "trakcerSol", detSizeX/2, detSizeY/2, alpideSizeZ/2
-    );
-    auto trackerFlexSol = new G4Box(
-      "trackerFlexSol", detSizeX/2, alpideSizeY/2, alpideSizeZ/2
-    );
-    auto alpidePixelCircuitSol = new G4Box(
-      "alpidePixelCircuitSol", alpidePixelSizeX/2, alpidePixelSizeY/2, alpidePixelCircuitSizeZ/2
-    );
-    auto alpidePixelEpiSol = new G4Box(
-      "alpidePixelEpiSol", alpidePixelSizeX/2, alpidePixelSizeY/2, alpidePixelEpiSizeZ/2
-    );
-    auto alpidePixelSol = new G4Box(
-      "alpidePixelSol", alpidePixelSizeX/2, alpidePixelSizeY/2, alpideSizeZ/2
-    );
-    auto alpidePixelRowSol = new G4Box(
-      "alpidePixelRowSol", alpideSizeX/2, alpidePixelSizeY/2, alpideSizeZ/2
-    );
+    auto pixelSol = new G4Box("pixel", pixelSizeXY/2, pixelSizeXY/2,
+      detSizeZ/2);
+    auto trackerSol = new G4Box("tracker", detSizeXY/2, detSizeXY/2, detSizeZ/2);
+    auto trackerRowSol = new G4Box("trackerRowSol", detSizeXY/2, pixelSizeXY/2,
+      detSizeZ/2);
 
+    auto pixelLog = new G4LogicalVolume(pixelSol, GdPlasticScintillator, "pixelLog");
     auto worldLog = new G4LogicalVolume(
       worldSol, airMat, "worldLog"
     );
@@ -135,141 +93,36 @@ namespace kcmh
     auto envVis = new G4VisAttributes();
     envVis->SetForceWireframe(true);
     envLog->SetVisAttributes(envVis);
-    auto dtcChipLog = new G4LogicalVolume(
-      dtcChipSol, airMat, "dtcChipSol"
-    );
-    dtcChipLog->SetVisAttributes(nonVis);
-    auto dtcChipXLog = new G4LogicalVolume(
-      dtcChipXSol, airMat, "dtcChipXLog"
-    );
-    dtcChipXLog->SetVisAttributes(nonVis);
-    auto dtcChipYLog = new G4LogicalVolume(
-      dtcChipYSol, airMat, "dtcChipYLog"
-    );
-    dtcChipYLog->SetVisAttributes(nonVis);
-    auto dtcLayerLog = new G4LogicalVolume(
-      dtcLayerSol, airMat, "dtcLayerLog"
-    );
-   
-    auto alpidePixelRowLog = new G4LogicalVolume(
-      alpidePixelRowSol, siliconMat, "alpidePixelRowLog"
+
+    auto trackerRowLog = new G4LogicalVolume(
+      trackerRowSol, airMat, "trackerRowLog"
     );
     auto trackerLog = new G4LogicalVolume(
       trackerSol, airMat, "trackerLog"
     );
-    trackerLog->SetVisAttributes(nonVis);
-    auto trackerFlexLog = new G4LogicalVolume(
-      trackerFlexSol, airMat, "trackerFlexLog"
-    );
-    trackerFlexLog->SetVisAttributes(nonVis);
 
-   
-    new G4PVPlacement(
-      nullptr,
-      alpidePixelCircuitInAlpidePos,
-      alpidePixelCircuitLog,
-      "alpidePixelCircuitPhys",
-      alpidePixelLog,
-      false,
-      0,
-      checkOverlaps
-    );
-    new G4PVPlacement(
-      nullptr,
-      alpidePixelEpiInAlpidePos,
-      alpidePixelEpiLog,
-      "alpidePixelEpiPhys",
-      alpidePixelLog,
-      false,
-      0,
-      checkOverlaps
-    );
-    new G4PVPlacement(
-      nullptr,
-      alpideInDtcPos,
-      alpideLog,
-      "absorberPixelPhys",
-      dtcChipLog,
-      false,
-      0,
-      checkOverlaps
-    );
-
-    if (!fIsVis)
-    {
-      new G4PVReplica(
-        "alpidePixelRowPhys",
-        alpidePixelLog,
-        alpidePixelRowLog,
-        kXAxis,
-        numOfPixelRow,
-        alpidePixelSizeX
-      );
-      new G4PVReplica(
-        "alpidePhys",
-        alpidePixelRowLog,
-        alpideLog,
-        kYAxis,
-        numOfPixelCol,
-        alpidePixelSizeY
-      );
-    }
     new G4PVReplica(
-      "dtcXPhys",
-      dtcChipLog,
-      dtcChipXLog,
+      "trackerRowPhys",
+      pixelLog,
+      trackerRowLog,
       kXAxis,
-      numAlpideCol,
-      alpideSizeX 
+      numOfPixels,
+      pixelSizeXY
     );
     new G4PVReplica(
-      "dtcYPhys",
-      dtcChipXLog,
-      dtcChipYLog,
-      kYAxis,
-      numAlpideRow,
-      alpideSizeY
-    );
-    new G4PVReplica(
-      "dtcLayerPhys",
-      dtcChipYLog,
-      dtcLayerLog,
-      kZAxis,
-      numOfDtcLayer,
-      dtcLayerDis
-    );
-    new G4PVReplica(
-      "trackerFlexPhys",
-      alpideLog,
-      trackerFlexLog,
-      kXAxis,
-      numAlpideCol,
-      alpideSizeX
-    );
-    new G4PVReplica(
-      "trackerPhys",
-      trackerFlexLog,
+      "trackerRowPhys",
+      trackerRowLog,
       trackerLog,
       kYAxis,
-      numAlpideRow,
-      alpideSizeY
+      numOfPixels,
+      pixelSizeXY
     );
 
-    new G4PVPlacement(
+    trackerPhys = new G4PVPlacement(
       nullptr,
-      trackerPos,
+      G4ThreeVector(),
       trackerLog,
       "trackerPhys",
-      envLog,
-      false,
-      0,
-      checkOverlaps
-    );
-    new G4PVPlacement(
-      nullptr,
-      dtcPos,
-      dtcLayerLog,
-      "dtcChipYPhys",
       envLog,
       false,
       0,
@@ -287,8 +140,6 @@ namespace kcmh
       checkOverlaps
     );
 
-    // installPhantom(true);
-
     return new G4PVPlacement(
       nullptr,
       G4ThreeVector(),
@@ -303,9 +154,16 @@ namespace kcmh
 
   void LynxDetectorConstruction::ConstructSDandField()
   {
-    G4String dtcSDName = "/Lynx";
-    auto dtcSD = new LynxTrackerSD(dtcSDName, "LynxHitsCollection");
-    G4SDManager::GetSDMpointer()->AddNewDetector(dtcSD);    
-    SetSensitiveDetector("alpidePixelEpiLog", dtcSD, true);
+    G4String lynxSDName = "/Lynx";
+    auto lynxSD = new LynxTrackerSD(lynxSDName, "LynxHitsCollection");
+    G4SDManager::GetSDMpointer()->AddNewDetector(lynxSD);    
+    SetSensitiveDetector("pixelLog", lynxSD, true);
+  }
+
+  void LynxDetectorConstruction::SetPosZ(const G4double posZ)
+  {
+    trackerPhys->SetTranslation(G4ThreeVector(0, 0, posZ));
+    auto runManager = G4RunManager::GetRunManager();
+    runManager->GeometryHasBeenModified();
   }
 } // namespace kcmh

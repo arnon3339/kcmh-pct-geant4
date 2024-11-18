@@ -53,16 +53,6 @@ namespace kcmh
       analysisManager->CreateNtupleIColumn("PDGe");
       analysisManager->FinishNtuple();
     }
-    else if (simMode == 1)
-    {
-      fAccX = std::make_unique<boost::accumulators::accumulator_set<double,
-      boost::accumulators::features<boost::accumulators::tag::mean,
-      boost::accumulators::tag::variance>>>();
-
-      fAccY = std::make_unique<boost::accumulators::accumulator_set<double,
-      boost::accumulators::features<boost::accumulators::tag::mean,
-      boost::accumulators::tag::variance>>>();
-    }
   }
 
   RunAction::~RunAction()
@@ -86,29 +76,36 @@ namespace kcmh
       analysisManager->Write();  // Write all histograms to file
       analysisManager->CloseFile();  // Close the ROOT file
     }
-    else if (fSimMode == 1)
-    {
-      auto particleAction = (PrimaryGeneratorAction*)G4RunManager::GetRunManager()
-        ->GetUserPrimaryGeneratorAction();
-      auto particleGun = particleAction->GetParticleGun();
-    }
   }
 
   void RunAction::InitLynxAcc()
   {
-    fAccX = std::make_unique<accumulator_set<double, features<tag::mean, tag::variance>>>();
-    fAccY = std::make_unique<accumulator_set<double, features<tag::mean, tag::variance>>>();
+    for (int i = 0; i < 6; i++)
+    {
+      fAccX[i] = std::make_unique<accumulator_set<double,
+        features<tag::mean, tag::variance>>>();
+      fAccY[i] = std::make_unique<accumulator_set<double,
+        features<tag::mean, tag::variance>>>();
+    }
   }
 
   void RunAction::ResetLynxAcc()
   {
-    fAccX.reset();
-    fAccY.reset();
+    for (int i = 0; i < 6; i++)
+    {
+      fAccX[i].reset();
+      fAccY[i].reset();
+    }
   }
 
   void RunAction::AddAccValues(G4int* xy)
   {
-    (*fAccX)(xy[0]);
-    (*fAccY)(xy[1]);
+    (*fAccX[fLayerID])(xy[0]);
+    (*fAccY[fLayerID])(xy[1]);
+  }
+
+  void RunAction::CalLynx()
+  {
+
   }
 } // namespace kcmh

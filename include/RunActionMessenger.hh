@@ -6,6 +6,7 @@
 class G4UIdirectory;
 class G4UIcmdWithAString;
 class G4UIcommand;
+class G4UIcmdWithAnInteger;
 class G4UIcmdWithoutParameter;
 class G4UIcmdWithADoubleAndUnit;
 
@@ -27,11 +28,16 @@ private:
   G4UIdirectory*      fLynxDirectory;
   G4UIcmdWithoutParameter* fResetLynx;
   G4UIcmdWithoutParameter* fInitLynx;
+  G4UIcmdWithoutParameter* fCalLynx;
 
   G4UIdirectory*      fBeamDirectory;
+  G4UIdirectory*      fDetDirectory;
 
   G4UIcmdWithADoubleAndUnit* fLabelBeamSigma;
   G4UIcmdWithADoubleAndUnit* fLabelBeamSigmaR;
+  G4UIcmdWithADoubleAndUnit* fLabelBeamSigmaE;
+
+  G4UIcmdWithAnInteger* fLabelDetLayer;
 
 public:
   RunActionMessenger(RunAction*);
