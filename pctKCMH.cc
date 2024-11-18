@@ -208,6 +208,13 @@ int main(int argc, char **argv)
               
               auto beamRunCmd = "/run/beamOn " + numOfBeam;
               UImanager->ApplyCommand(beamRunCmd);
+
+              G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
+              G4cout << "Sigma step: " << sigma_i << ", Sigma angle step: " << sigma_ai <<
+                ", Sigma energy step: " << sigma_ei << G4endl;
+              G4cout << "Sigma: " << sigma << ", Sigma angle: " << angleSigma <<
+                ", Sigma energy: " << energySigma << G4endl;
+              G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
             }
           }
         }
