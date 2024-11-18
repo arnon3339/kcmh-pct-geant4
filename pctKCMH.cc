@@ -76,7 +76,8 @@ int main(int argc, char **argv)
   auto rotationArray = program.get<std::vector<float>>("--rotate");
 
   G4UIExecutive* ui = nullptr;
-  if (!macroFile.compare("init_vis.mac")) ui = new G4UIExecutive(argc, argv);
+  if (!simMode.compare("pct") && !macroFile.compare("init_vis.mac")) 
+    ui = new G4UIExecutive(argc, argv);
 
   auto runManager = 
     G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
