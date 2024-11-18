@@ -2,11 +2,6 @@
 #define RUNACTION_HH 1
 
 #include "G4UserRunAction.hh"
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
-#include <memory>
-
-using namespace boost::accumulators;
 
 class G4Run;
 class G4String;

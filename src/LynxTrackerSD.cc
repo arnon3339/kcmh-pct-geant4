@@ -48,6 +48,7 @@ namespace kcmh
       step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(),
       step->GetPreStepPoint()->GetTouchableHandle()->GetReplicaNumber(1)
     );
+    newHit->SetPosZ(step->GetPreStepPoint()->GetPosition().getZ());
     fHitsCollection->insert(newHit);
 
     return true;

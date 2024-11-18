@@ -105,6 +105,12 @@ namespace kcmh
       fRunAction->SetLabeledBeamSigmaR(inputValue);
     }
 
+    if (command == fLabelBeamSigmaE)
+    {
+      auto inputValue = fLabelBeamSigmaE->GetNewDoubleValue(newValue);
+      fRunAction->SetLabeledBeamSigmaE(inputValue);
+    }
+
     if (command == fLabelDetLayer)
     {
       auto inputValue = fLabelDetLayer->GetNewIntValue(newValue);

@@ -6,18 +6,6 @@
 #include "G4AnalysisManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4RunManager.hh"
-#include "G4String.hh"
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
-
-#include <iostream>
-#include <filesystem>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <memory>
-
-using namespace boost::accumulators;
 
 namespace kcmh
 {
@@ -44,6 +32,7 @@ namespace kcmh
       analysisManager->CreateNtupleIColumn("eventID");
       analysisManager->CreateNtupleIColumn("pixelX");
       analysisManager->CreateNtupleIColumn("pixelY");
+      analysisManager->CreateNtupleDColumn("posZ");
       analysisManager->CreateNtupleIColumn("layerID");
       analysisManager->CreateNtupleDColumn("K");
       analysisManager->CreateNtupleDColumn("edep");
@@ -59,6 +48,7 @@ namespace kcmh
       analysisManager->CreateNtupleIColumn("eventID");
       analysisManager->CreateNtupleIColumn("pixelX");
       analysisManager->CreateNtupleIColumn("pixelY");
+      analysisManager->CreateNtupleDColumn("posZ");
       analysisManager->CreateNtupleIColumn("layerID");
       analysisManager->CreateNtupleDColumn("K");
       analysisManager->CreateNtupleDColumn("edep");

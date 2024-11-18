@@ -30,6 +30,7 @@ class TrackerHit : public G4VHit
     void SetPixels      (G4int, G4int);
     void SetParentID (G4int parentID) { fParentID = parentID; }
     void SetK (G4double K) { fK = K; };
+    void SetPosZ(G4double posZ) { fPosZ = posZ; };
 
     // Get methods
     G4int GetTrackID() const     { return fTrackID; };
@@ -39,12 +40,14 @@ class TrackerHit : public G4VHit
     G4int GetPDGEncoding() { return fPDGEncoding; };
     G4int GetParentID() { return fParentID; };
     G4double GetK() { return fK; };
+    G4double GetPosZ() { return fPosZ; };
 
   private:
     G4int         fTrackID = -1;
     G4int         fLayerID = -1;
     G4double      fEdep = 0.;
     G4double      fK = 0.;
+    G4double      fPosZ = 0.;
     G4int         fPixels[2]{-1, -1};
     G4int         fPDGEncoding = -1;
     G4int         fParentID = -1;

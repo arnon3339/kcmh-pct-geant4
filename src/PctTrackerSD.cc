@@ -65,6 +65,7 @@ namespace kcmh
     newHit->SetPDGEncoding(track->GetParticleDefinition()->GetPDGEncoding());
     newHit->SetParentID(track->GetParentID());
     newHit->SetTrackID(step->GetTrack()->GetTrackID());
+    newHit->SetPosZ(step->GetPreStepPoint()->GetPosition().getZ());
     fHitsCollection->insert(newHit);
 
     return true;

@@ -21,7 +21,7 @@ namespace kcmh
   LynxDetectorConstruction::LynxDetectorConstruction(G4bool isVis)
   :fIsVis(isVis), detMessenger(0)
   {
-    
+   detMessenger = new DetectorMessenger(this); 
   }
 
   LynxDetectorConstruction::~LynxDetectorConstruction()
