@@ -19,7 +19,7 @@ def run_pct_kcmh(en_range=[]):
     print(en_range)
     os.system(f'cd {path.join(os.getcwd(), "build")} && \
 ./pctKCMH -m {parser_args.macro} -p {parser_args.phantom} -b {parser_args.beam} \
--t {parser_args.thread} -e {" ".join([str(en) for en in parser_args.energy])}')
+-t {parser_args.thread} -e {" ".join([str(en) for en in en_range])}')
 
 if __name__ == '__main__':
     en_args_len = len(parser_args.energy)
