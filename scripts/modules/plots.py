@@ -1,4 +1,38 @@
+from os import path
+import matplotlib
+matplotlib.rcParams['axes.unicode_minus'] = False
+from matplotlib.colors import ListedColormap,LinearSegmentedColormap, Normalize
+from matplotlib import cm
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
+import numpy as np
+import pandas as pd
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.patches import Ellipse
+from matplotlib.ticker import (MultipleLocator,
+                               FormatStrFormatter,
+                               AutoMinorLocator)
+from matplotlib.lines import Line2D
+from matplotlib import ticker
+from scipy.optimize import curve_fit
+from scipy import stats
+import numpy.typing as npt
+from typing import Any
+import json
+
+FONT_SIZE = 28
+
+plt.rcParams['font.family'] = "Times New Roman"
+plt.rcParams['font.weight'] = 'bold'
+plt.rcParams['font.size'] = FONT_SIZE
+
+# Prevent math text from using a different font
+plt.rcParams['mathtext.fontset'] = 'custom'
+plt.rcParams['mathtext.rm'] = 'Times New Roman'  # Roman (serif) font
+plt.rcParams['mathtext.it'] = 'Times New Roman:italic'  # Italic font
+plt.rcParams['mathtext.bf'] = 'Times New Roman'  # Bold font
+plt.rcParams['mathtext.sf'] = 'Times New Roman'  # Sans-serif font
+plt.rcParams['mathtext.tt'] = 'Times New Roman'  # Monospace font
 
 def plot_dtc_hits_2d(*args, **kwargs):
     if 'data' in kwargs.keys():
