@@ -30,18 +30,24 @@ def get_beam_sigma(en, dis):
 def get_beam_angle(en, dis):
     pass
 
-def fit_sigma_data(en=200):
-    files = os.listdir(DATA_DIR)
+def fit_sigma_data(en=200, angle=False, energy=False):
+    data_dir = '../build/output'
+    files = [f for f in os.listdir(data_dir) if 'root' in f]
     sigerr_arr = np.zeros(len(files))
-    for f_i, f in enumerate(files):
-        with uproot.open(path.join(DATA_DIR, f)) as f:
+    for ff_i, ff in enumerate(files):
+        print(f"{ff_i}: Starting {ff}")
+        with uproot.open(path.join(data_dir, ff)) as f:
             tree = f['LYNX;1']
             df: pd.DataFrame = tree.arrays(library='pd')
             df = df[df.layerID < 5]
-            # df_posz = df.groupby(['layerID'], as_index=False)\
-            #     ['posZ'].mean()
-            # print(df_posz)
-            df_std = df.groupby(['layerID', 'sigma'], as_index=False)\
+            
+            col = 'sigma'
+            if angle and not energy:
+                col = 'sigmaA'
+            elif energy and not angle:
+                col = 'sigmaE'
+
+            df_std = df.groupby(['layerID', col], as_index=False)\
                 [['pixelX', 'pixelY']].std()
             df_std['pixel'] = df_std.apply(lambda row:
                 (row['pixelX'] + row['pixelY'])/2, axis=1)
@@ -49,9 +55,9 @@ def fit_sigma_data(en=200):
                 KCMH_DATA[en][int(4 - row['layerID'])])\
                     /KCMH_DATA[en][int(4 - row['layerID'])],
                                             axis=1)
-            df_err = df_std.groupby('sigma', as_index=False)['sigerr'].mean()
-            sigerr_arr[f_i] = df_err[df_err.sigerr <= df_err['sigerr'].min()]\
-                ['sigma'].values[0]
-    return sigerr_arr.mean()
 
-print(fit_sigma_data())
+            df_err = df_std.groupby(col, as_index=False)['sigerr'].mean()
+            sigerr_arr[ff_i] = df_err[df_err.sigerr <= df_err['sigerr'].min()]\
+                [col].values[0]
+        print(f"{ff_i}: Finished {ff}")
+    return sigerr_arr.mean()
