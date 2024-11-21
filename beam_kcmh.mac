@@ -1,7 +1,7 @@
 /gps/pos/shape Circle
 /gps/pos/centre 0 0 -42.1 cm
 /gps/pos/radius 0. mm
-/gps/pos/sigma_r 3. mm
+/gps/pos/sigma_r 3.6 mm
 /gps/particle proton
 /gps/pos/type Beam
 
@@ -11,7 +11,7 @@
 /gps/ang/rot1 0 1 0 
 /gps/ang/rot2 1 0 0
 /gps/ang/type beam1d
-/gps/ang/sigma_r 0.0001 deg
+/gps/ang/sigma_r 0.057 deg
 
 /gps/ene/type Gauss
 /gps/ene/mono 200 MeV
