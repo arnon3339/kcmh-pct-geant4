@@ -368,13 +368,16 @@ namespace kcmh
   void PctDetectorConstruction::RotatePhantom(const G4double& angle)
   {
     phAngle = angle;
-    auto rMatrix = new G4RotationMatrix();
-    rMatrix->rotateY(phAngle);
+    if (ph)
+    {
+      auto rMatrix = new G4RotationMatrix();
+      rMatrix->rotateY(phAngle);
 
-    phPhys->SetRotation(rMatrix);
+      phPhys->SetRotation(rMatrix);
 
-    auto runManager = G4RunManager::GetRunManager();
-    runManager->GeometryHasBeenModified();
+      auto runManager = G4RunManager::GetRunManager();
+      runManager->GeometryHasBeenModified();
+    }
   }
 
 } // namespace kcmh

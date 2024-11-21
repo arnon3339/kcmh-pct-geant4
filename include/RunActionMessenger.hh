@@ -26,15 +26,25 @@ private:
   G4UIcmdWithAString* fOutputFileCmd;
 
   G4UIdirectory*      fLynxDirectory;
+  G4UIdirectory*      fPctDirectory;
 
-  G4UIdirectory*      fBeamDirectory;
-  G4UIdirectory*      fDetDirectory;
+  G4UIdirectory*      fLynxBeamDirectory;
+  G4UIdirectory*      fLynxDetDirectory;
 
-  G4UIcmdWithADoubleAndUnit* fLabelBeamSigma;
-  G4UIcmdWithADoubleAndUnit* fLabelBeamSigmaR;
-  G4UIcmdWithADoubleAndUnit* fLabelBeamSigmaE;
+  G4UIdirectory*      fPctBeamDirectory;
+  G4UIdirectory*      fPctDetDirectory;
 
-  G4UIcmdWithAnInteger* fLabelDetLayer;
+  G4UIdirectory*      fPctDetPhDirectory;
+
+  G4UIcmdWithADoubleAndUnit* fLynxLabelBeamSigma;
+  G4UIcmdWithADoubleAndUnit* fLynxLabelBeamSigmaR;
+  G4UIcmdWithADoubleAndUnit* fLynxLabelBeamSigmaE;
+  G4UIcmdWithAnInteger* fLynxLabelDetLayer;
+
+  G4UIcmdWithADoubleAndUnit* fPctLabelBeamPosX;
+
+  G4UIcmdWithADoubleAndUnit* fPctLabelPhAngle;
+
 
   G4UIcmdWithoutParameter* fCloseOutFile;
 

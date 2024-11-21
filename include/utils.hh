@@ -64,6 +64,39 @@ std::string createOutputDirs(const float& energy, const float& angle)
     exit(EXIT_FAILURE);
   }
 }
+
+std::string createSingleOutputDirs(const float& energy)
+{
+  auto energyStrs = split(std::to_string(energy), ".");
+  std::ostringstream ossAngle;
+  std::ostringstream ossEnergy;
+  ossEnergy << std::setw(3) << std::setfill('0') << energyStrs[0];
+
+  std::string energyDir = "";
+
+  if (energyStrs.size() > 1 && !(atof(energyStrs[1].c_str()) == 0.))
+  {
+    energyDir = ossEnergy.str() + "." + energyStrs[1];
+  }
+  else energyDir = ossEnergy.str();
+
+  auto outputDir =  "./output/eMeV_" + energyDir;
+  auto outputPath =  outputDir + "/run.root";
+
+  try
+  {
+    if (std::filesystem::is_directory(outputDir))
+      std::filesystem::remove_all(outputDir);
+    std::filesystem::create_directories(outputDir);
+    return outputPath;
+  }
+  catch (std::filesystem::filesystem_error e)
+  {
+    std::cerr << "Cannot create output path!" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
 } // namespace kcmh
 
 #endif

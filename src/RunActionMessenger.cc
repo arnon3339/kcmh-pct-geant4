@@ -32,57 +32,101 @@ namespace kcmh
     fLynxDirectory = new G4UIdirectory("/run/lynx/");
     fLynxDirectory->SetGuidance("Run action control for lynx");
 
-    fBeamDirectory = new G4UIdirectory("/run/lynx/beam/");
-    fBeamDirectory->SetGuidance("Run action control for beam lynx");
+    fPctDirectory = new G4UIdirectory("/run/pct/");
+    fPctDirectory->SetGuidance("Run action control for pct");
 
-    fDetDirectory = new G4UIdirectory("/run/lynx/det/");
-    fDetDirectory->SetGuidance("Run action control for detector lynx");
+    fLynxBeamDirectory = new G4UIdirectory("/run/lynx/beam/");
+    fLynxBeamDirectory->SetGuidance("Run action control for beam lynx");
 
-    fLabelDetLayer
+    fLynxDetDirectory = new G4UIdirectory("/run/lynx/det/");
+    fLynxDetDirectory->SetGuidance("Run action control for detector lynx");
+
+    fPctBeamDirectory = new G4UIdirectory("/run/pct/beam/");
+    fPctBeamDirectory->SetGuidance("Run action control for beam pCT");
+
+    fPctDetDirectory = new G4UIdirectory("/run/pct/det/");
+    fPctDetDirectory->SetGuidance("Run action control for detector pct");
+
+    fPctDetPhDirectory = new G4UIdirectory("/run/pct/det/ph/");
+    fPctDetPhDirectory->SetGuidance("Run action control for detector phantom of pct");
+
+    fLynxLabelDetLayer
       = new G4UIcmdWithAnInteger("/run/lynx/det/layerID",this);
-    fLabelDetLayer->SetGuidance("Input the layerID for lynx detector.");
-    fLabelDetLayer->SetParameterName("Layer ID", false);
-    fLabelDetLayer->SetDefaultValue(0);
-    fLabelDetLayer->AvailableForStates(G4State_PreInit,G4State_Idle);    
+    fLynxLabelDetLayer->SetGuidance("Input the layerID for lynx detector.");
+    fLynxLabelDetLayer->SetParameterName("Layer ID", false);
+    fLynxLabelDetLayer->SetDefaultValue(0);
+    fLynxLabelDetLayer->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
-    fLabelBeamSigma
+    fLynxLabelBeamSigma
       = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_r",this);
-    fLabelBeamSigma->SetGuidance("Input the beam sigma (mm) for lynx beam.");
-    fLabelBeamSigma->SetParameterName("Sigma(mm)", false);
-    fLabelBeamSigma->SetDefaultValue(0. *mm);
-    fLabelBeamSigma->SetDefaultUnit("mm");
-    fLabelBeamSigma->AvailableForStates(G4State_PreInit,G4State_Idle);    
+    fLynxLabelBeamSigma->SetGuidance("Input the beam sigma (mm) for lynx beam.");
+    fLynxLabelBeamSigma->SetParameterName("Sigma(mm)", false);
+    fLynxLabelBeamSigma->SetDefaultValue(0. *mm);
+    fLynxLabelBeamSigma->SetDefaultUnit("mm");
+    fLynxLabelBeamSigma->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
-    fLabelBeamSigmaR
+    fLynxLabelBeamSigmaR
       = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_a",this);
-    fLabelBeamSigmaR->SetGuidance("Input the beam angle sigma (degree) for lynx beam.");
-    fLabelBeamSigmaR->SetParameterName("Sigma(deg)", false);
-    fLabelBeamSigmaR->SetDefaultValue(0.0001 *deg);
-    fLabelBeamSigmaR->SetDefaultUnit("deg");
-    fLabelBeamSigmaR->AvailableForStates(G4State_PreInit,G4State_Idle);    
+    fLynxLabelBeamSigmaR->SetGuidance("Input the beam angle sigma (degree) for lynx beam.");
+    fLynxLabelBeamSigmaR->SetParameterName("Sigma(deg)", false);
+    fLynxLabelBeamSigmaR->SetDefaultValue(0.0001 *deg);
+    fLynxLabelBeamSigmaR->SetDefaultUnit("deg");
+    fLynxLabelBeamSigmaR->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
-    fLabelBeamSigmaE
+    fLynxLabelBeamSigmaE
       = new G4UIcmdWithADoubleAndUnit("/run/lynx/beam/sigma_e",this);
-    fLabelBeamSigmaE->SetGuidance("Input the beam energy sigma (MeV) for lynx beam.");
-    fLabelBeamSigmaE->SetParameterName("Sigma(MeV)", false);
-    fLabelBeamSigmaE->SetDefaultValue(0.1 *MeV);
-    fLabelBeamSigmaE->SetDefaultUnit("MeV");
-    fLabelBeamSigmaE->AvailableForStates(G4State_PreInit,G4State_Idle);    
+    fLynxLabelBeamSigmaE->SetGuidance("Input the beam energy sigma (MeV) for lynx beam.");
+    fLynxLabelBeamSigmaE->SetParameterName("Sigma(MeV)", false);
+    fLynxLabelBeamSigmaE->SetDefaultValue(0.1 *MeV);
+    fLynxLabelBeamSigmaE->SetDefaultUnit("MeV");
+    fLynxLabelBeamSigmaE->AvailableForStates(G4State_PreInit,G4State_Idle);    
+
+    fPctLabelBeamPosX
+      = new G4UIcmdWithADoubleAndUnit("/run/pct/beam/posx",this);
+    fPctLabelBeamPosX->SetGuidance("Input the beam x position for pct beam.");
+    fPctLabelBeamPosX->SetParameterName("PosX(cm)", false);
+    fPctLabelBeamPosX->SetDefaultValue(0. *cm);
+    fPctLabelBeamPosX->SetDefaultUnit("cm");
+    fPctLabelBeamPosX->AvailableForStates(G4State_PreInit,G4State_Idle);    
+
+    fPctLabelPhAngle
+      = new G4UIcmdWithADoubleAndUnit("/run/pct/det/ph/angle",this);
+    fPctLabelPhAngle->SetGuidance("Input the phantom rotation for pct detetector.");
+    fPctLabelPhAngle->SetParameterName("Angle(deg)", false);
+    fPctLabelPhAngle->SetDefaultValue(0. *deg);
+    fPctLabelPhAngle->SetDefaultUnit("deg");
+    fPctLabelPhAngle->AvailableForStates(G4State_PreInit,G4State_Idle);    
 
   }
 
   RunActionMessenger::~RunActionMessenger()
   {
     delete fRunDirectory;
+
     delete fFileDirectory;
     delete fOutputFileCmd;
-    delete fBeamDirectory;
-    delete fLabelBeamSigma;
-    delete fLabelBeamSigmaR;
-    delete fLabelBeamSigmaE;
-    delete fDetDirectory;
+
     delete fLynxDirectory;
-    delete fLabelDetLayer;
+    delete fPctDirectory;
+
+    delete fLynxBeamDirectory;
+    delete fLynxDetDirectory;
+
+    delete fPctBeamDirectory;
+    delete fPctDetDirectory;
+
+    delete fPctDetPhDirectory;
+
+    delete fLynxLabelBeamSigma;
+    delete fLynxLabelBeamSigmaR;
+    delete fLynxLabelBeamSigmaE;
+    delete fLynxLabelDetLayer;
+
+    delete fPctLabelBeamPosX;
+
+    delete fPctLabelPhAngle;
+
+
     delete fCloseOutFile;
   }
 
@@ -93,28 +137,40 @@ namespace kcmh
       fRunAction->OpenOutputFile(newValue);
     }
 
-    if (command == fLabelBeamSigma)
+    if (command == fLynxLabelBeamSigma)
     {
-      auto inputValue = fLabelBeamSigma->GetNewDoubleValue(newValue);
-      fRunAction->SetLabeledBeamSigma(inputValue);
+      auto inputValue = fLynxLabelBeamSigma->GetNewDoubleValue(newValue);
+      fRunAction->SetLynxLabeledBeamSigma(inputValue);
     }
 
-    if (command == fLabelBeamSigmaR)
+    if (command == fLynxLabelBeamSigmaR)
     {
-      auto inputValue = fLabelBeamSigmaR->GetNewDoubleValue(newValue);
-      fRunAction->SetLabeledBeamSigmaR(inputValue);
+      auto inputValue = fLynxLabelBeamSigmaR->GetNewDoubleValue(newValue);
+      fRunAction->SetLynxLabeledBeamSigmaR(inputValue);
     }
 
-    if (command == fLabelBeamSigmaE)
+    if (command == fLynxLabelBeamSigmaE)
     {
-      auto inputValue = fLabelBeamSigmaE->GetNewDoubleValue(newValue);
-      fRunAction->SetLabeledBeamSigmaE(inputValue);
+      auto inputValue = fLynxLabelBeamSigmaE->GetNewDoubleValue(newValue);
+      fRunAction->SetLynxLabeledBeamSigmaE(inputValue);
     }
 
-    if (command == fLabelDetLayer)
+    if (command == fLynxLabelDetLayer)
     {
-      auto inputValue = fLabelDetLayer->GetNewIntValue(newValue);
-      fRunAction->SetLabeledDetLayer(inputValue);
+      auto inputValue = fLynxLabelDetLayer->GetNewIntValue(newValue);
+      fRunAction->SetLynxLabeledDetLayer(inputValue);
+    }
+
+    if (command == fPctLabelBeamPosX)
+    {
+      auto inputValue = fPctLabelBeamPosX->GetNewDoubleValue(newValue);
+      fRunAction->SetPctLabeledBeamPosX(inputValue);
+    }
+
+    if (command == fPctLabelPhAngle)
+    {
+      auto inputValue = fPctLabelPhAngle->GetNewDoubleValue(newValue);
+      fRunAction->SetPctLabeledPhAngle(inputValue);
     }
 
     if (command == fCloseOutFile)

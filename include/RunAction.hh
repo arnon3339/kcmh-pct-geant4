@@ -15,10 +15,13 @@ namespace kcmh
     private:
       const RunActionMessenger* fRunActionMessenger;
       const G4int fSimMode;
-      G4int fLayerID;
-      G4double fBeamSigma;
-      G4double fBeamSigmaA;
-      G4double fBeamSigmaE;
+      G4int fLynxLayerID;
+      G4double fLynxBeamSigma;
+      G4double fLynxBeamSigmaA;
+      G4double fLynxBeamSigmaE;
+
+      G4double fPctBeamPosX;
+      G4double fPctPhAngle;
 
     public:
       RunAction(const G4int);
@@ -30,15 +33,20 @@ namespace kcmh
       void OpenOutputFile(const G4String&);
       void CloseOutFile();
 
-      void SetLabeledBeamSigma(G4double sigma) { fBeamSigma = sigma; };
-      void SetLabeledBeamSigmaR(G4double sigmaR) { fBeamSigmaA = sigmaR; };
-      void SetLabeledBeamSigmaE(G4double sigmaE) { fBeamSigmaE = sigmaE; };
-      void SetLabeledDetLayer(G4int layerID) { fLayerID = layerID; };
+      void SetLynxLabeledBeamSigma(G4double sigma) { fLynxBeamSigma = sigma; };
+      void SetLynxLabeledBeamSigmaR(G4double sigmaR) { fLynxBeamSigmaA = sigmaR; };
+      void SetLynxLabeledBeamSigmaE(G4double sigmaE) { fLynxBeamSigmaE = sigmaE; };
+      void SetLynxLabeledDetLayer(G4int layerID) { fLynxLayerID = layerID; };
 
-      G4double GetLabeledBeamSigma() { return fBeamSigma; };
-      G4double GetLabeledBeamSigmaR() { return fBeamSigmaA; };
-      G4double GetLabeledBeamSigmaE() { return fBeamSigmaE; };
-      G4int GetLabeledDetLayerID() { return fLayerID; };
+      void SetPctLabeledBeamPosX(G4double posX) { fPctBeamPosX = posX; };
+      void SetPctLabeledPhAngle(G4double angle) { fPctPhAngle = angle; };
+
+      G4double GetLynxLabeledBeamSigma() { return fLynxBeamSigma; };
+      G4double GetLynxLabeledBeamSigmaR() { return fLynxBeamSigmaA; };
+      G4double GetLynxLabeledBeamSigmaE() { return fLynxBeamSigmaE; };
+      G4int GetLynxLabeledDetLayerID() { return fLynxLayerID; };
+      G4double GetPctLabeledBeamPosX() { return fPctBeamPosX; };
+      G4double GetPctLabeledPhAngle() { return fPctPhAngle; };
   };
 } // namespace kcmh
 

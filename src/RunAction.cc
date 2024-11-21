@@ -11,7 +11,8 @@ namespace kcmh
 {
   RunAction::RunAction(const G4int simMode)
   : fRunActionMessenger(new RunActionMessenger(this)), fSimMode(simMode),
-  fLayerID(0), fBeamSigma(0), fBeamSigmaA(0), fBeamSigmaE(0)
+  fLynxLayerID(0), fLynxBeamSigma(0), fLynxBeamSigmaA(0), fLynxBeamSigmaE(0),
+  fPctBeamPosX(0), fPctPhAngle(0)
   {
 
     auto analysisManager = G4AnalysisManager::Instance(); 
@@ -34,6 +35,8 @@ namespace kcmh
       analysisManager->CreateNtupleIColumn("pixelY");
       analysisManager->CreateNtupleDColumn("posZ");
       analysisManager->CreateNtupleIColumn("layerID");
+      analysisManager->CreateNtupleDColumn("phAngle");
+      analysisManager->CreateNtupleDColumn("beamPosX");
       analysisManager->CreateNtupleDColumn("K");
       analysisManager->CreateNtupleDColumn("edep");
       analysisManager->CreateNtupleDColumn("thickness");
@@ -84,11 +87,6 @@ namespace kcmh
 
   void RunAction::EndOfRunAction(const G4Run*)
   {
-    if (fSimMode == 0)
-    {
-      auto analysisManager = G4AnalysisManager::Instance();
-      analysisManager->Write();  // Write all histograms to file
-      analysisManager->CloseFile();  // Close the ROOT file
-    }
+    
   }
 } // namespace kcmh

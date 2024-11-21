@@ -72,8 +72,10 @@ namespace kcmh
       analysisManager->FillNtupleIColumn(2, (*DTC)[i]->GetPixels()[1]);
       analysisManager->FillNtupleDColumn(3, (*DTC)[i]->GetPosZ());
       analysisManager->FillNtupleIColumn(4, (*DTC)[i]->GetLayerID());
-      analysisManager->FillNtupleDColumn(5, (*DTC)[i]->GetK());
-      analysisManager->FillNtupleDColumn(6, (*DTC)[i]->GetEdep());
+      analysisManager->FillNtupleDColumn(5, fRunAction->GetPctLabeledPhAngle()/deg);
+      analysisManager->FillNtupleDColumn(6, fRunAction->GetPctLabeledBeamPosX());
+      analysisManager->FillNtupleDColumn(7, (*DTC)[i]->GetK());
+      analysisManager->FillNtupleDColumn(8, (*DTC)[i]->GetEdep());
 
       if ((i > 0) && ((*DTC)[i-1]->GetLayerID() != ((*DTC)[i]->GetLayerID())))
       {
@@ -110,14 +112,14 @@ namespace kcmh
         G4double angle = std::acos(std::clamp(dotProduct / productTwoNorms, -1.0, 1.0));
 
         if (std::abs(std::cos(angle)) > 1e-6) 
-          analysisManager->FillNtupleDColumn(7, totalThickness * (1 / std::cos(angle)));
-        else analysisManager->FillNtupleDColumn(7, totalThickness);
+          analysisManager->FillNtupleDColumn(9, totalThickness * (1 / std::cos(angle)));
+        else analysisManager->FillNtupleDColumn(9, totalThickness);
       }
       else
-        analysisManager->FillNtupleDColumn(7, 0.);
-      analysisManager->FillNtupleIColumn(8, (*DTC)[i]->GetTrackID());
-      analysisManager->FillNtupleIColumn(9, (*DTC)[i]->GetParentID());
-      analysisManager->FillNtupleIColumn(10, (*DTC)[i]->GetPDGEncoding());
+        analysisManager->FillNtupleDColumn(9, 0.);
+      analysisManager->FillNtupleIColumn(10, (*DTC)[i]->GetTrackID());
+      analysisManager->FillNtupleIColumn(11, (*DTC)[i]->GetParentID());
+      analysisManager->FillNtupleIColumn(12, (*DTC)[i]->GetPDGEncoding());
       analysisManager->AddNtupleRow();
     }
   }
@@ -136,12 +138,12 @@ namespace kcmh
       analysisManager->FillNtupleIColumn(1, (*LYNX)[i]->GetPixels()[0]);
       analysisManager->FillNtupleIColumn(2, (*LYNX)[i]->GetPixels()[1]);
       analysisManager->FillNtupleDColumn(3, (*LYNX)[i]->GetPosZ());
-      analysisManager->FillNtupleIColumn(4, fRunAction->GetLabeledDetLayerID());
+      analysisManager->FillNtupleIColumn(4, fRunAction->GetLynxLabeledDetLayerID());
       analysisManager->FillNtupleDColumn(5, (*LYNX)[i]->GetK());
       analysisManager->FillNtupleDColumn(6, (*LYNX)[i]->GetEdep());
-      analysisManager->FillNtupleDColumn(7, fRunAction->GetLabeledBeamSigma());
-      analysisManager->FillNtupleDColumn(8, fRunAction->GetLabeledBeamSigmaR());
-      analysisManager->FillNtupleDColumn(9, fRunAction->GetLabeledBeamSigmaE());
+      analysisManager->FillNtupleDColumn(7, fRunAction->GetLynxLabeledBeamSigma());
+      analysisManager->FillNtupleDColumn(8, fRunAction->GetLynxLabeledBeamSigmaR());
+      analysisManager->FillNtupleDColumn(9, fRunAction->GetLynxLabeledBeamSigmaE());
       analysisManager->FillNtupleIColumn(10, (*LYNX)[i]->GetTrackID());
       analysisManager->FillNtupleIColumn(11, (*LYNX)[i]->GetParentID());
       analysisManager->FillNtupleIColumn(12, (*LYNX)[i]->GetPDGEncoding());

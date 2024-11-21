@@ -59,6 +59,12 @@ int main(int argc, char **argv)
   .default_value(std::vector<float>{})
   .action([](const std::string& value) { return std::stof(value); });
 
+  program.add_argument("-bt", "--translate")
+  .help("beam translation (cm)")
+  .nargs(3)
+  .default_value(std::vector<float>{})
+  .action([](const std::string& value) { return std::stof(value); });
+
   program.add_argument("--thread", "-t")
   .help("The number of threads")
   .nargs(1)
@@ -74,6 +80,7 @@ int main(int argc, char **argv)
   auto numOfBeam = program.get("--beam");
   auto beamEnergyArray = program.get<std::vector<float>>("--energy");
   auto rotationArray = program.get<std::vector<float>>("--rotate");
+  auto beamTransArray = program.get<std::vector<float>>("--translate");
 
   G4UIExecutive* ui = nullptr;
   if (!simMode.compare("pct") && !macroFile.compare("init_vis.mac")) 
@@ -117,6 +124,7 @@ int main(int argc, char **argv)
       UImanager->ApplyCommand(execCommand + macroFile);
       float newRotationArray[] = {0., 0., 1.};
       float newEnergyArray[] = {200., 200., 1.};
+      float newBeamTransArray[] = {0., 0., 1.};
 
       if (rotationArray.size())
         if (rotationArray.size() < 2)
@@ -154,24 +162,51 @@ int main(int argc, char **argv)
           newEnergyArray[2] = beamEnergyArray[2];
         }
 
+      if (beamTransArray.size())
+        if (beamTransArray.size() < 2) 
+        {
+          newBeamTransArray[0] = beamTransArray[0];
+          newBeamTransArray[1] = beamTransArray[0];
+        }
+        else if (beamTransArray.size() < 3)
+        {
+          newBeamTransArray[0] = beamTransArray[0];
+          newBeamTransArray[1] = beamTransArray[1];
+        }
+        else
+        {
+          newBeamTransArray[0] = beamTransArray[0];
+          newBeamTransArray[1] = beamTransArray[1];
+          newBeamTransArray[2] = beamTransArray[2];
+        }
+
       for (float energy = newEnergyArray[0]; energy <= newEnergyArray[1];
         energy += newEnergyArray[2])
       {
+        auto beamEnergy = std::to_string(energy) + G4String(" MeV");
+        UImanager->ApplyCommand("/gps/ene/mono " + beamEnergy);
+
+        auto outputPath = createSingleOutputDirs(energy);
+        UImanager->ApplyCommand("/run/file/output " + outputPath);
+
         for (float angle = newRotationArray[0]; angle <= newRotationArray[1];
           angle += newRotationArray[2])
         {
-          auto outputPath = createOutputDirs(energy, angle);
-          auto runOutputFileCmd = "/run/file/output " + outputPath;
-          auto rotatePhCmd = "/det/phantom/rotate/angle " + 
-            std::to_string(angle) + " deg";
-          auto beamEnergyCmd = "/gps/ene/mono " + std::to_string(energy) + " MeV";
-          auto beamRunCmd = "/run/beamOn " + numOfBeam;
+          auto phAngle = std::to_string(angle) + G4String(" deg");
+          UImanager->ApplyCommand("/det/phantom/rotate/angle " + phAngle);
+          UImanager->ApplyCommand("/run/pct/det/ph/angle " + phAngle);
 
-          UImanager->ApplyCommand(runOutputFileCmd);
-          UImanager->ApplyCommand(beamEnergyCmd);
-          UImanager->ApplyCommand(rotatePhCmd);
-          UImanager->ApplyCommand(beamRunCmd);
+          for (float beamPosX = newBeamTransArray[0]; beamPosX <= newBeamTransArray[1];
+            beamPosX += newBeamTransArray[2])
+          {
+            auto beamTransPosX = std::to_string(beamPosX) + G4String(" 0 -42.1 cm");
+            UImanager->ApplyCommand("/gps/pos/centre " + beamTransPosX);
+            UImanager->ApplyCommand("/run/pct/beam/posx " + 
+              std::to_string(beamPosX) + G4String(" cm"));
+            UImanager->ApplyCommand("/run/beamOn " + numOfBeam);
+          }
         }
+        UImanager->ApplyCommand("/run/file/close");
       }
     }
     else if (!G4StrUtil::icompare(simMode, "lynx"))
