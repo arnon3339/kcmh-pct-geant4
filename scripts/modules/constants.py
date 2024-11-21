@@ -7,6 +7,7 @@ AIR_DENS = 0.0012 #g/cm^3
 BEAM_SIGMAS = {
     200: {
         'sigma-r': 3.60, #mm
-        'sigma-a': 0.057 #deg
+        'sigma-a': 0.057, #deg
+        'sigma-e': 0.1 #MeV
     }
 }
