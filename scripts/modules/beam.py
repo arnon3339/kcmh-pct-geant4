@@ -67,6 +67,7 @@ def check_sigma_data(en=200, angle=False, energy=False):
     files = [f for f in os.listdir(data_dir) if 'root' in f]
     sigerr_arr = np.zeros(len(files))
     data_list = []
+    data_list2 = []
     for ff_i, ff in enumerate(files):
         print(f"{ff_i}: Starting {ff}")
         with uproot.open(path.join(data_dir, ff)) as f:
@@ -79,6 +80,8 @@ def check_sigma_data(en=200, angle=False, energy=False):
             df_std['pixel'] = df_std.apply(lambda row:
                 (row['pixelX'] + row['pixelY'])*0.5/2, axis=1)
             data_list.append(df_std)
+            data_list2.append(df.groupby('layerID', as_index=False)['posZ'].first())
         print(f"{ff_i}: Finished {ff}")
     print(pd.concat(data_list, ignore_index=True).groupby('layerID')['pixel'].mean())
+    print(pd.concat(data_list2, ignore_index=True).groupby('layerID')['posZ'].mean())
     return sigerr_arr.mean()

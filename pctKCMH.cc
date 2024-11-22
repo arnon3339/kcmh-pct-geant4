@@ -227,11 +227,11 @@ int main(int argc, char **argv)
 
         if (program["--optimized"] == true)
         {
-            UImanager->ApplyCommand("/gps/pos/sigma_r 0.36 mm");
-            UImanager->ApplyCommand("/run/lynx/beam/sigma_r 0.36 mm");
-            UImanager->ApplyCommand("/gps/ang/sigma_r 0.057 deg");
+            // UImanager->ApplyCommand("/gps/pos/sigma_r 3.6 mm");
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_r 3.6 mm");
+            // UImanager->ApplyCommand("/gps/ang/sigma_r 0.057 deg");
             UImanager->ApplyCommand("/run/lynx/beam/sigma_a 0.057 deg");
-            UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
+            // UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
             UImanager->ApplyCommand("/run/lynx/beam/sigma_e 0.1 MeV");
             auto beamRunCmd = "/run/beamOn " + numOfBeam;
             UImanager->ApplyCommand(beamRunCmd);
