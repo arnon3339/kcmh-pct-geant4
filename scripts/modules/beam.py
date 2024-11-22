@@ -61,3 +61,24 @@ def fit_sigma_data(en=200, angle=False, energy=False):
                 [col].values[0]
         print(f"{ff_i}: Finished {ff}")
     return sigerr_arr.mean()
+
+def check_sigma_data(en=200, angle=False, energy=False):
+    data_dir = '../build/output'
+    files = [f for f in os.listdir(data_dir) if 'root' in f]
+    sigerr_arr = np.zeros(len(files))
+    data_list = []
+    for ff_i, ff in enumerate(files):
+        print(f"{ff_i}: Starting {ff}")
+        with uproot.open(path.join(data_dir, ff)) as f:
+            tree = f['LYNX;1']
+            df: pd.DataFrame = tree.arrays(library='pd')
+            df = df[df.layerID < 5]
+            
+            df_std = df.groupby(['layerID'], as_index=False)\
+                [['pixelX', 'pixelY']].std()
+            df_std['pixel'] = df_std.apply(lambda row:
+                (row['pixelX'] + row['pixelY'])*0.5/2, axis=1)
+            data_list.append(df_std)
+        print(f"{ff_i}: Finished {ff}")
+    print(pd.concat(data_list, ignore_index=True).groupby('layerID')['pixel'].mean())
+    return sigerr_arr.mean()

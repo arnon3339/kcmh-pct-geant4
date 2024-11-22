@@ -71,6 +71,11 @@ int main(int argc, char **argv)
   .default_value(1)
   .action([](const std::string& value) { return std::stoi(value); });
 
+  program.add_argument("--optimized")
+  .help("optimized beam")
+  .default_value(false)
+  .implicit_value(true);
+
   program.parse_args(argc, argv);
 
   auto simMode = program.get("--mode");
@@ -219,32 +224,47 @@ int main(int argc, char **argv)
         UImanager->ApplyCommand("/det/lynx/posz "+ std::to_string((layerID - 2.)*10.)
           + G4String(" cm"));
         UImanager->ApplyCommand("/run/lynx/det/layerID " + std::to_string(layerID));
-        for (int sigma_i = 0; sigma_i < 100; sigma_i++)
-        {
-          auto sigma = std::to_string(2. + (2./100.)*sigma_i) + G4String(" mm");
-          UImanager->ApplyCommand("/gps/pos/sigma_r " + sigma);
-          UImanager->ApplyCommand("/run/lynx/beam/sigma_r " + sigma);
-          for (int sigma_ai = 0; sigma_ai < 100; sigma_ai++)
-          {
-            auto angleSigma = std::to_string(0.0001 + (0.1 - 0.0001)*sigma_ai/100) +
-              G4String(" deg");
-            UImanager->ApplyCommand("/gps/ang/sigma_r " + angleSigma);
-            UImanager->ApplyCommand("/run/lynx/beam/sigma_a " + angleSigma);
-            for (int sigma_ei = 0; sigma_ei < 100; sigma_ei++)
-            {
-              auto energySigma = std::to_string(sigma_ei/100.) + G4String(" MeV");
-              UImanager->ApplyCommand("/gps/ene/sigma " + energySigma);
-              UImanager->ApplyCommand("/run/lynx/beam/sigma_e " + energySigma);
-              
-              auto beamRunCmd = "/run/beamOn " + numOfBeam;
-              UImanager->ApplyCommand(beamRunCmd);
 
-              G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
-              G4cout << "Sigma step: " << sigma_i << ", Sigma angle step: " << sigma_ai <<
-                ", Sigma energy step: " << sigma_ei << G4endl;
-              G4cout << "Sigma: " << sigma << ", Sigma angle: " << angleSigma <<
-                ", Sigma energy: " << energySigma << G4endl;
-              G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
+        if (program["--optimized"] == true)
+        {
+            UImanager->ApplyCommand("/gps/pos/sigma_r 0.36 mm");
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_r 0.36 mm");
+            UImanager->ApplyCommand("/gps/ang/sigma_r 0.057 deg");
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_a 0.057 deg");
+            UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_e 0.1 MeV");
+            auto beamRunCmd = "/run/beamOn " + numOfBeam;
+            UImanager->ApplyCommand(beamRunCmd);
+        }
+        else
+        {
+          for (int sigma_i = 0; sigma_i < 100; sigma_i++)
+          {
+            auto sigma = std::to_string(2. + (2./100.)*sigma_i) + G4String(" mm");
+            UImanager->ApplyCommand("/gps/pos/sigma_r " + sigma);
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_r " + sigma);
+            for (int sigma_ai = 0; sigma_ai < 100; sigma_ai++)
+            {
+              auto angleSigma = std::to_string(0.0001 + (0.1 - 0.0001)*sigma_ai/100) +
+                G4String(" deg");
+              UImanager->ApplyCommand("/gps/ang/sigma_r " + angleSigma);
+              UImanager->ApplyCommand("/run/lynx/beam/sigma_a " + angleSigma);
+              for (int sigma_ei = 0; sigma_ei < 100; sigma_ei++)
+              {
+                auto energySigma = std::to_string(sigma_ei/100.) + G4String(" MeV");
+                UImanager->ApplyCommand("/gps/ene/sigma " + energySigma);
+                UImanager->ApplyCommand("/run/lynx/beam/sigma_e " + energySigma);
+                
+                auto beamRunCmd = "/run/beamOn " + numOfBeam;
+                UImanager->ApplyCommand(beamRunCmd);
+
+                G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
+                G4cout << "Sigma step: " << sigma_i << ", Sigma angle step: " << sigma_ai <<
+                  ", Sigma energy step: " << sigma_ei << G4endl;
+                G4cout << "Sigma: " << sigma << ", Sigma angle: " << angleSigma <<
+                  ", Sigma energy: " << energySigma << G4endl;
+                G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
+              }
             }
           }
         }
