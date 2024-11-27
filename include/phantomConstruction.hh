@@ -20,10 +20,7 @@ namespace kcmh
     G4int fPhIndex;
     G4String fPhName;
     const std::array<const std::string, 5> refPhantoms = {
-    "catphan404",
-    "brain",
-    "heart",
-    "lung",
+    "kcmh",
     "test"
 };
     /* data */

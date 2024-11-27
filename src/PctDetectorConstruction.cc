@@ -45,15 +45,16 @@ namespace kcmh
     auto airMat = nist->FindOrBuildMaterial("G4_AIR");
     auto siliconMat = nist->FindOrBuildMaterial("G4_Si");
     auto aluminiumMat = nist->FindOrBuildMaterial("G4_Al");
+    auto copperMat = nist->FindOrBuildMaterial("G4_Cu");
     auto nonVis = new G4VisAttributes();
     nonVis->SetVisibility(false);
 
     G4double envSizeXY = 30. *cm;
     G4double envSizeZ = 4. *m;
 
-    G4int numAlpideCol = 9;
-    G4int numAlpideRow = 12;
-    G4int numOfDtcLayer = 42;
+    G4int numAlpideCol = 4;
+    G4int numAlpideRow = 1;
+    G4int numOfDtcLayer = 5;
     G4int numOfPixelRow = 1024;
     G4int numOfPixelCol = 512;
     G4double alpideSizeX = 3. *cm;
@@ -63,7 +64,7 @@ namespace kcmh
     G4double alpideSizeZ = 50. *um;
     G4double alpidePixelCircuitSizeZ = 11. *um;
     G4double alpidePixelEpiSizeZ = 25. *um;
-    G4double absorberSizeZ = 3.5 *mm;
+    G4double absorberSizeZ = 2.0 *mm;
     G4double absorberSizeX = alpideSizeX;
     G4double absorberSizeY = alpideSizeY;
     G4double absorberGapSizeZ = 4. *mm;
@@ -72,8 +73,8 @@ namespace kcmh
     G4double detSizeY = alpideSizeY*numAlpideRow;
     G4double dtcSizeZ = dtcLayerDis*numOfDtcLayer;
     G4double phSizeXY = 30. *cm;
-    G4double phSizeZ = 30. *cm;
-    G4double phToTrackerSizeZ = 2.5 *cm;
+    G4double phSizeZ = 10. *cm;
+    G4double phToTrackerSizeZ = 11.5 *cm;
 
     auto trackerPos = G4ThreeVector(0, 0,
       phSizeZ/2 + phToTrackerSizeZ + alpideSizeZ/2
@@ -177,7 +178,7 @@ namespace kcmh
     );
     alpidePixelEpiLog->SetVisAttributes(nonVis);
     auto absorberLog = new G4LogicalVolume(
-      absorberSol, aluminiumMat, "absorberLog"
+      absorberSol, copperMat, "absorberLog"
     );
     auto alpidePixelLog = new G4LogicalVolume(
       alpidePixelSol, siliconMat, "alpidePixelLog"
