@@ -185,90 +185,93 @@ namespace kcmh
     
     G4Material *m_acrylic_low = new G4Material("myAcrylicLow", 1.14*g/cm3, 3);
     G4Material *m_acrylic = new G4Material("myAcrylic", 1.18*g/cm3, 3);
-    m_acrylic_low->AddElement(G4Element::GetElement("C"), 5);
-    m_acrylic->AddElement(G4Element::GetElement("C"), 5);
-    m_acrylic_low->AddElement(G4Element::GetElement("H"), 8);
-    m_acrylic->AddElement(G4Element::GetElement("H"), 8);
-    m_acrylic_low->AddElement(G4Element::GetElement("O"), 2);
-    m_acrylic->AddElement(G4Element::GetElement("O"), 2);
+    G4Material* m_acrylic = new G4Material("myAcrylic", 1.18 * g / cm3, 3);
+
+    m_acrylic->AddElement(G4Element::GetElement("C"), 0.621);  // 62.1% Carbon by mass
+    m_acrylic->AddElement(G4Element::GetElement("H"), 0.050);  // 5.0% Hydrogen by mass
+    m_acrylic->AddElement(G4Element::GetElement("O"), 0.329);  // 32.9% Oxygen by mass
+
+    m_acrylic_low->AddElement(G4Element::GetElement("C"), 0.621);  // 62.1% Carbon by mass
+    m_acrylic_low->AddElement(G4Element::GetElement("H"), 0.050);  // 5.0% Hydrogen by mass
+    m_acrylic_low->AddElement(G4Element::GetElement("O"), 0.329);  // 32.9% Oxygen by mass
     mat.insert({std::string("AcrylicLow"), m_acrylic_low});
     mat.insert({std::string("Acrylic"), m_acrylic});
 
     G4Material *m_pmp = new G4Material("myPMP", 0.853*g/cm3, 2);
-    m_pmp->AddElement(G4Element::GetElement("C"), 7);
-    m_pmp->AddElement(G4Element::GetElement("H"), 14);
+    m_pmp->AddElement(G4Element::GetElement("C"), 0.625);
+    m_pmp->AddElement(G4Element::GetElement("H"), 0.375);
     mat.insert({std::string("PMP"), m_pmp});
 
     G4Material *m_ldpe = new G4Material("myLDPE", 0.945*g/cm3, 2);
-    m_ldpe->AddElement(G4Element::GetElement("C"), 2);
-    m_ldpe->AddElement(G4Element::GetElement("H"), 4);
+    m_ldpe->AddElement(G4Element::GetElement("C"), 0.858);
+    m_ldpe->AddElement(G4Element::GetElement("H"), 0.142);
     mat.insert({std::string("LDPE"), m_ldpe});
 
     G4Material *m_polystr = new G4Material("myPolystr", 0.998*g/cm3, 2);
-    m_polystr->AddElement(G4Element::GetElement("C"), 8);
-    m_polystr->AddElement(G4Element::GetElement("H"), 8);
+    m_polystr->AddElement(G4Element::GetElement("C"), 0.927);
+    m_polystr->AddElement(G4Element::GetElement("H"), 0.073);
     mat.insert({std::string("Polystyrene"), m_polystr});
 
     G4Material *m_delrin = new G4Material("myDelrin", 1.363*g/cm3, 3);
-    m_delrin->AddElement(G4Element::GetElement("C"), 1);
-    m_delrin->AddElement(G4Element::GetElement("H"), 2);
-    m_delrin->AddElement(G4Element::GetElement("O"), 1);
+    m_delrin->AddElement(G4Element::GetElement("C"), 0.613);
+    m_delrin->AddElement(G4Element::GetElement("H"), 0.125);
+    m_delrin->AddElement(G4Element::GetElement("O"), 0.262);
     mat.insert({std::string("Delrin"), m_delrin});
     
     G4Material *m_teflon = new G4Material("myTeflon", 1.868*g/cm3, 2);
-    m_teflon->AddElement(nist->FindOrBuildElement("C"), 1);
-    m_teflon->AddElement(nist->FindOrBuildElement("F"), 2);
+    m_teflon->AddElement(nist->GetElement("C"), 0.241);
+    m_teflon->AddElement(nist->GetElement("F"), 0.759);
     mat.insert({std::string("Teflon"), m_teflon});
 
     G4Material *m_ramp = new G4Material("myRamp", 1.252*g/cm3, 11);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("H"), 7.9/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("C"), 34.5/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("N"), 2.9/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("O"), 41.3/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("Na"), 0.2/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("Mg"), 0.1/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("F"), 3.9/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("S"), 0.2/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("Cl"), 0.1/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("K"), 0.1/100);
-    m_ramp->AddElementByMassFraction(nist->FindOrBuildElement("Ca"), 8.8/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("H"), 7.9/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("C"), 34.5/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("N"), 2.9/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("O"), 41.3/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("Na"), 0.2/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("Mg"), 0.1/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("F"), 3.9/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("S"), 0.2/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("Cl"), 0.1/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("K"), 0.1/100);
+    m_ramp->AddElementByMassFraction(nist->GetElement("Ca"), 8.8/100);
     mat.insert({std::string("Ramp"), m_ramp});
 
     G4Material *m_heartwall = new G4Material("heartWall", 1.051*g/cm3, 9);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("H"), 10.4/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("C"), 13.5/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("N"), 2.9/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("O"), 72.3/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("Na"), 0.1/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("P"), 0.2/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("S"), 0.2/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("Cl"), 0.2/100);
-    m_heartwall->AddElementByMassFraction(nist->FindOrBuildElement("K"), 0.3/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("H"), 10.4/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("C"), 13.5/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("N"), 2.9/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("O"), 72.3/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("Na"), 0.1/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("P"), 0.2/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("S"), 0.2/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("Cl"), 0.2/100);
+    m_heartwall->AddElementByMassFraction(nist->GetElement("K"), 0.3/100);
     mat.insert({std::string("heartwall"), m_heartwall});
 
     G4Material *m_brain = new G4Material("brain", 1.041*g/cm3, 9);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("H"), 10.7/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("C"), 14.3/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("N"), 2.3/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("O"), 71.3/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("Na"), 0.2/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("P"), 0.4/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("S"), 0.2/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("Cl"), 0.3/100);
-    m_brain->AddElementByMassFraction(nist->FindOrBuildElement("K"), 0.3/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("H"), 10.7/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("C"), 14.3/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("N"), 2.3/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("O"), 71.3/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("Na"), 0.2/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("P"), 0.4/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("S"), 0.2/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("Cl"), 0.3/100);
+    m_brain->AddElementByMassFraction(nist->GetElement("K"), 0.3/100);
     mat.insert({std::string("brain"), m_brain});
 
     G4Material *m_lung = new G4Material("lung", 0.415*g/cm3, 10);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("H"), 10.2/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("C"), 10.8/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("N"), 3.2/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("O"), 74.8/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("Na"), 0.1/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("P"), 0.1/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("S"), 0.2/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("Cl"), 0.3/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("K"), 0.2/100);
-    m_lung->AddElementByMassFraction(nist->FindOrBuildElement("Fe"), 0.1/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("H"), 10.2/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("C"), 10.8/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("N"), 3.2/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("O"), 74.8/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("Na"), 0.1/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("P"), 0.1/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("S"), 0.2/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("Cl"), 0.3/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("K"), 0.2/100);
+    m_lung->AddElementByMassFraction(nist->GetElement("Fe"), 0.1/100);
     mat.insert({std::string("lung"), m_lung});
 
   }
