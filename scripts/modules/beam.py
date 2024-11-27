@@ -85,3 +85,30 @@ def check_sigma_data(en=200, angle=False, energy=False):
     print(pd.concat(data_list, ignore_index=True).groupby('layerID')['pixel'].mean())
     print(pd.concat(data_list2, ignore_index=True).groupby('layerID')['posZ'].mean())
     return sigerr_arr.mean()
+
+def fit_sigmas_data(en=200):
+    data_dir = '../build/output'
+    files = [f for f in os.listdir(data_dir) if 'root' in f]
+    sigerr_arr = np.zeros((len(files), 2))
+    for ff_i, ff in enumerate(files):
+        print(f"{ff_i}: Starting {ff}")
+        with uproot.open(path.join(data_dir, ff)) as f:
+            tree = f['LYNX;1']
+            df: pd.DataFrame = tree.arrays(library='pd')
+            df = df[df.layerID < 5]
+
+            df_std = df.groupby(['layerID', 'sigma', 'sigmaA'], as_index=False)\
+                [['pixelX', 'pixelY']].std()
+            df_std['pixel'] = df_std.apply(lambda row:
+                (row['pixelX'] + row['pixelY'])/2, axis=1)
+            df_std['sigerr'] = df_std.apply(lambda row: np.abs(row['pixel']*0.5 -\
+                KCMH_DATA[en][int(4 - row['layerID'])])\
+                    /KCMH_DATA[en][int(4 - row['layerID'])],
+                                            axis=1)
+
+            df_err = df_std.groupby(['sigma', 'sigmaA'], as_index=False)['sigerr'].mean()
+            sigma_min = df_err[df_err.sigerr <= df_err['sigerr'].min()]['sigma'].values[0]
+            sigma_a_min = df_err[df_err.sigerr <= df_err['sigerr'].min()]['sigmaA'].values[0]
+            sigerr_arr[ff_i] = [sigma_min, sigma_a_min]
+        print(f"{ff_i}: Finished {ff}")
+    return np.mean(sigerr_arr, axis=0)
