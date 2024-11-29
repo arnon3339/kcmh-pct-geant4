@@ -40,7 +40,7 @@ int main(int argc, char **argv)
   program.add_argument("--phantom", "-p")
   .help("The phantom name")
   .nargs(1)
-  .default_value("catphan404");
+  .default_value("cylinder1/4");
 
   program.add_argument("--beam", "-b")
   .help("The number of beam")
@@ -228,9 +228,9 @@ int main(int argc, char **argv)
         if (program["--optimized"] == true)
         {
             // UImanager->ApplyCommand("/gps/pos/sigma_r 3.6 mm");
-            UImanager->ApplyCommand("/run/lynx/beam/sigma_r 3.6 mm");
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_r 3.4 mm");
             // UImanager->ApplyCommand("/gps/ang/sigma_r 0.057 deg");
-            UImanager->ApplyCommand("/run/lynx/beam/sigma_a 0.057 deg");
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_a 0.1 deg");
             // UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
             UImanager->ApplyCommand("/run/lynx/beam/sigma_e 0.1 MeV");
             auto beamRunCmd = "/run/beamOn " + numOfBeam;

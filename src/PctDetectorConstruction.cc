@@ -49,8 +49,8 @@ namespace kcmh
     auto nonVis = new G4VisAttributes();
     nonVis->SetVisibility(false);
 
-    G4double envSizeXY = 30. *cm;
-    G4double envSizeZ = 4. *m;
+    G4double envSizeXY = 20. *cm;
+    G4double envSizeZ = 80. *cm;
 
     G4int numAlpideCol = 4;
     G4int numAlpideRow = 1;
@@ -145,8 +145,8 @@ namespace kcmh
       envSol, airMat, "envLog"
     );
     auto envVis = new G4VisAttributes();
-    envVis->SetForceWireframe(true);
-    envLog->SetVisAttributes(envVis);
+    // envVis->SetForceWireframe(true);
+    envLog->SetVisAttributes(nonVis);
     auto dtcChipLog = new G4LogicalVolume(
       dtcChipSol, airMat, "dtcChipSol"
     );
