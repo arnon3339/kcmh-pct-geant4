@@ -11,19 +11,14 @@
 #include "utils.hh"
 #include "CLHEP/Random/Random.h"
 
+#include <iostream>
+#include <filesystem>
+
 using namespace kcmh;
 
 int main(int argc, char **argv)
 {
-  CLHEP::HepRandom::setTheSeed(123456);
-  try
-  {
-    if (std::filesystem::create_directory("./output")){}
-  }
-  catch(const std::filesystem::filesystem_error& e)
-  {
-    exit(EXIT_FAILURE);
-  }
+  std::filesystem::path exePath = std::filesystem::current_path();
   
   argparse::ArgumentParser program("pctKCMH"); 
 
@@ -65,6 +60,12 @@ int main(int argc, char **argv)
   .default_value(std::vector<float>{})
   .action([](const std::string& value) { return std::stof(value); });
 
+  program.add_argument("--condorid")
+  .help("using condor clusters and process")
+  .nargs(2)
+  .default_value(std::vector<int>{0, 0})
+  .action([](const std::string& value) { return std::stoi(value); });
+
   program.add_argument("--thread", "-t")
   .help("The number of threads")
   .nargs(1)
@@ -73,6 +74,11 @@ int main(int argc, char **argv)
 
   program.add_argument("--optimized")
   .help("optimized beam")
+  .default_value(false)
+  .implicit_value(true);
+
+  program.add_argument("--condor")
+  .help("enabling condor")
   .default_value(false)
   .implicit_value(true);
 
@@ -86,6 +92,7 @@ int main(int argc, char **argv)
   auto beamEnergyArray = program.get<std::vector<float>>("--energy");
   auto rotationArray = program.get<std::vector<float>>("--rotate");
   auto beamTransArray = program.get<std::vector<float>>("--translate");
+  auto condorID = program.get<std::vector<int>>("--condorid");
 
   G4UIExecutive* ui = nullptr;
   if (!simMode.compare("pct") && !macroFile.compare("init_vis.mac")) 
@@ -123,6 +130,7 @@ int main(int argc, char **argv)
 
   if (macroFile.compare("init_vis.mac") || !simMode.compare("lynx"))
   {
+    UImanager->ApplyCommand("/run/initialize");
     float newRotationArray[] = {0., 0., 1.};
     float newEnergyArray[] = {200., 200., 1.};
     float newBeamTransArray[] = {0., 0., 1.};
@@ -163,35 +171,52 @@ int main(int argc, char **argv)
         newEnergyArray[2] = beamEnergyArray[2];
       }
 
-    if (beamTransArray.size())
-      if (beamTransArray.size() < 2) 
-      {
-        newBeamTransArray[0] = beamTransArray[0];
-        newBeamTransArray[1] = beamTransArray[0];
-      }
-      else if (beamTransArray.size() < 3)
-      {
-        newBeamTransArray[0] = beamTransArray[0];
-        newBeamTransArray[1] = beamTransArray[1];
-      }
-      else
-      {
-        newBeamTransArray[0] = beamTransArray[0];
-        newBeamTransArray[1] = beamTransArray[1];
-        newBeamTransArray[2] = beamTransArray[2];
-      }
-
-    UImanager->ApplyCommand("/run/initialize");
+      if (beamTransArray.size())
+        if (beamTransArray.size() < 2) 
+        {
+          newBeamTransArray[0] = beamTransArray[0];
+          newBeamTransArray[1] = beamTransArray[0];
+        }
+        else if (beamTransArray.size() < 3)
+        {
+          newBeamTransArray[0] = beamTransArray[0];
+          newBeamTransArray[1] = beamTransArray[1];
+        }
+        else
+        {
+          newBeamTransArray[0] = beamTransArray[0];
+          newBeamTransArray[1] = beamTransArray[1];
+          newBeamTransArray[2] = beamTransArray[2];
+        }
     if (!G4StrUtil::icompare(simMode, "pct"))
     {
       UImanager->ApplyCommand(execCommand + macroFile);
+
       for (float energy = newEnergyArray[0]; energy <= newEnergyArray[1];
         energy += newEnergyArray[2])
       {
         auto beamEnergy = std::to_string(energy) + G4String(" MeV");
         UImanager->ApplyCommand("/gps/ene/mono " + beamEnergy);
 
-        auto outputPath = createSingleOutputDirs(energy);
+        std::string outputPath;
+        if (program["--condor"] == true)
+        {
+          std::ostringstream ossClusterID;
+          std::ostringstream ossProcessID;
+          ossClusterID << std::setw(3) << std::setfill('0') << std::to_string(condorID[0]);
+          ossProcessID << std::setw(3) << std::setfill('0') << std::to_string(condorID[1]);
+          outputPath = createSingleOutputDirs(
+            exePath.string() + std::string("/dataout/") +
+            ossClusterID.str() + std::string("/") + 
+            ossProcessID.str(),
+            energy
+            );
+        }
+        else
+        {
+          outputPath = createSingleOutputDirs(exePath.string() +
+            std::string("/dataout"), energy);
+        }
         UImanager->ApplyCommand("/run/file/output " + outputPath);
 
         for (float angle = newRotationArray[0]; angle <= newRotationArray[1];
@@ -219,8 +244,26 @@ int main(int argc, char **argv)
       UImanager->ApplyCommand(execCommand + "beam_kcmh.mac");
       auto beamEnergy = std::to_string(newEnergyArray[0]) + G4String(" MeV");
       UImanager->ApplyCommand("/gps/ene/mono " + beamEnergy);
-      auto runOutputFileCmd = "/run/file/output ./output/lynx.root";
-      UImanager->ApplyCommand(runOutputFileCmd);
+      std::string outputPath;
+      if (program["--condor"] == true)
+      {
+        std::ostringstream ossClusterID;
+        std::ostringstream ossProcessID;
+        ossClusterID << std::setw(3) << std::setfill('0') << std::to_string(condorID[0]);
+        ossProcessID << std::setw(3) << std::setfill('0') << std::to_string(condorID[1]);
+        outputPath = createSingleOutputDirs(
+          exePath.string() + std::string("/dataout/") +
+          ossClusterID.str() + std::string("/") + 
+          ossProcessID.str(),
+          newEnergyArray[0]
+          );
+      }
+      else
+      {
+        outputPath = createSingleOutputDirs(exePath.string() +
+          std::string("/dataout"), newEnergyArray[0]);
+      }
+      UImanager->ApplyCommand("/run/file/output " + outputPath);
       for (int layerID = 0; layerID < 6; layerID++)
       {
         UImanager->ApplyCommand("/det/lynx/posz "+ std::to_string((layerID - 2.)*10.)
@@ -232,7 +275,7 @@ int main(int argc, char **argv)
             // UImanager->ApplyCommand("/gps/pos/sigma_r 3.6 mm");
             UImanager->ApplyCommand("/run/lynx/beam/sigma_r 3.6 mm");
             // UImanager->ApplyCommand("/gps/ang/sigma_r 0.057 deg");
-            UImanager->ApplyCommand("/run/lynx/beam/sigma_a 0.057 deg");
+            UImanager->ApplyCommand("/run/lynx/beam/sigma_a 0.004 deg");
             // UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
             UImanager->ApplyCommand("/run/lynx/beam/sigma_e 0.1 MeV");
             auto beamRunCmd = "/run/beamOn " + numOfBeam;
@@ -242,16 +285,15 @@ int main(int argc, char **argv)
         {
           for (int sigma_i = 0; sigma_i < 10; sigma_i++)
           {
-            auto sigma = std::to_string(3. + (1./10.)*sigma_i) + G4String(" mm");
+            auto sigma = std::to_string(2. + (2./10.)*sigma_i) + G4String(" mm");
             UImanager->ApplyCommand("/gps/pos/sigma_r " + sigma);
             UImanager->ApplyCommand("/run/lynx/beam/sigma_r " + sigma);
             for (int sigma_ai = 0; sigma_ai < 10; sigma_ai++)
             {
-              auto angleSigma = std::to_string(0.001 + (0.01 - 0.001)*sigma_ai/10) +
+              auto angleSigma = std::to_string(0.001 + 0.001*sigma_ai/10) +
                 G4String(" deg");
               UImanager->ApplyCommand("/gps/ang/sigma_r " + angleSigma);
               UImanager->ApplyCommand("/run/lynx/beam/sigma_a " + angleSigma);
-              // auto energySigma = std::to_string(sigma_ei/100.) + G4String(" MeV");
               UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
               UImanager->ApplyCommand("/run/lynx/beam/sigma_e 0.1 MeV");
               

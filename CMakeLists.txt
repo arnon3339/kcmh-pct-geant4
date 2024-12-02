@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.20.0...3.29.0)
 project(kcmh-pct-geant4)
 
+set(CMAKE_CXX_STANDARD 17)  # Set C++17 as the standard
+set(CMAKE_CXX_STANDARD_REQUIRED ON)  # Make sure C++17 is required
+
 option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
 if(WITH_GEANT4_UIVIS)
   find_package(Geant4 REQUIRED ui_all vis_all)

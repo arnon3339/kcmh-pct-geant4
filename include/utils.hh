@@ -65,7 +65,7 @@ std::string createOutputDirs(const float& energy, const float& angle)
   }
 }
 
-std::string createSingleOutputDirs(const float& energy)
+std::string createSingleOutputDirs(const std::string mainPath, const float& energy)
 {
   auto energyStrs = split(std::to_string(energy), ".");
   std::ostringstream ossAngle;
@@ -80,7 +80,7 @@ std::string createSingleOutputDirs(const float& energy)
   }
   else energyDir = ossEnergy.str();
 
-  auto outputDir =  "./output/eMeV_" + energyDir;
+  auto outputDir =  mainPath + std::string("/eMeV_" + energyDir);
   auto outputPath =  outputDir + "/run.root";
 
   try
