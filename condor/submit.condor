@@ -1,0 +1,11 @@
+# This is a comment
+universe = vanilla
+executable = run_geant4.sh
+arguments = -m beam_kcmh.mac -b 1000 -t 4 -bt -11 11 -p catphan404 -e 200 -r $(arg) --condor --condorid $(ClusterId) $(Process)
+log = logs/condor_$(Process).log
+output = output/out_$(Process).txt
+error = error/err_$(Process).txt
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = /home/arnon/projects/kcmh-pct-geant4/beam_kcmh.mac
+queue arg from arguments.txt
