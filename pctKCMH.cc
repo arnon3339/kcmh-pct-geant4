@@ -123,68 +123,68 @@ int main(int argc, char **argv)
 
   if (macroFile.compare("init_vis.mac") || !simMode.compare("lynx"))
   {
+    float newRotationArray[] = {0., 0., 1.};
+    float newEnergyArray[] = {200., 200., 1.};
+    float newBeamTransArray[] = {0., 0., 1.};
+
+    if (rotationArray.size())
+      if (rotationArray.size() < 2)
+      {
+        newRotationArray[0] = rotationArray[0];
+        newRotationArray[1] = rotationArray[0];
+      }
+      else if (rotationArray.size() < 3)
+      {
+        newRotationArray[0] = rotationArray[0];
+        newRotationArray[1] = rotationArray[1];
+      }
+      else
+      {
+        newRotationArray[0] = rotationArray[0];
+        newRotationArray[1] = rotationArray[1];
+        newRotationArray[2] = rotationArray[2];
+      }
+
+    if (beamEnergyArray.size())
+      if (beamEnergyArray.size() < 2) 
+      {
+        newEnergyArray[0] = beamEnergyArray[0];
+        newEnergyArray[1] = beamEnergyArray[0];
+      }
+      else if (beamEnergyArray.size() < 3)
+      {
+        newEnergyArray[0] = beamEnergyArray[0];
+        newEnergyArray[1] = beamEnergyArray[1];
+      }
+      else
+      {
+        newEnergyArray[0] = beamEnergyArray[0];
+        newEnergyArray[1] = beamEnergyArray[1];
+        newEnergyArray[2] = beamEnergyArray[2];
+      }
+
+    if (beamTransArray.size())
+      if (beamTransArray.size() < 2) 
+      {
+        newBeamTransArray[0] = beamTransArray[0];
+        newBeamTransArray[1] = beamTransArray[0];
+      }
+      else if (beamTransArray.size() < 3)
+      {
+        newBeamTransArray[0] = beamTransArray[0];
+        newBeamTransArray[1] = beamTransArray[1];
+      }
+      else
+      {
+        newBeamTransArray[0] = beamTransArray[0];
+        newBeamTransArray[1] = beamTransArray[1];
+        newBeamTransArray[2] = beamTransArray[2];
+      }
+
     UImanager->ApplyCommand("/run/initialize");
     if (!G4StrUtil::icompare(simMode, "pct"))
     {
       UImanager->ApplyCommand(execCommand + macroFile);
-      float newRotationArray[] = {0., 0., 1.};
-      float newEnergyArray[] = {200., 200., 1.};
-      float newBeamTransArray[] = {0., 0., 1.};
-
-      if (rotationArray.size())
-        if (rotationArray.size() < 2)
-        {
-          newRotationArray[0] = rotationArray[0];
-          newRotationArray[1] = rotationArray[0];
-        }
-        else if (rotationArray.size() < 3)
-        {
-          newRotationArray[0] = rotationArray[0];
-          newRotationArray[1] = rotationArray[1];
-        }
-        else
-        {
-          newRotationArray[0] = rotationArray[0];
-          newRotationArray[1] = rotationArray[1];
-          newRotationArray[2] = rotationArray[2];
-        }
-
-      if (beamEnergyArray.size())
-        if (beamEnergyArray.size() < 2) 
-        {
-          newEnergyArray[0] = beamEnergyArray[0];
-          newEnergyArray[1] = beamEnergyArray[0];
-        }
-        else if (beamEnergyArray.size() < 3)
-        {
-          newEnergyArray[0] = beamEnergyArray[0];
-          newEnergyArray[1] = beamEnergyArray[1];
-        }
-        else
-        {
-          newEnergyArray[0] = beamEnergyArray[0];
-          newEnergyArray[1] = beamEnergyArray[1];
-          newEnergyArray[2] = beamEnergyArray[2];
-        }
-
-      if (beamTransArray.size())
-        if (beamTransArray.size() < 2) 
-        {
-          newBeamTransArray[0] = beamTransArray[0];
-          newBeamTransArray[1] = beamTransArray[0];
-        }
-        else if (beamTransArray.size() < 3)
-        {
-          newBeamTransArray[0] = beamTransArray[0];
-          newBeamTransArray[1] = beamTransArray[1];
-        }
-        else
-        {
-          newBeamTransArray[0] = beamTransArray[0];
-          newBeamTransArray[1] = beamTransArray[1];
-          newBeamTransArray[2] = beamTransArray[2];
-        }
-
       for (float energy = newEnergyArray[0]; energy <= newEnergyArray[1];
         energy += newEnergyArray[2])
       {
@@ -217,6 +217,8 @@ int main(int argc, char **argv)
     else if (!G4StrUtil::icompare(simMode, "lynx"))
     {
       UImanager->ApplyCommand(execCommand + "beam_kcmh.mac");
+      auto beamEnergy = std::to_string(newEnergyArray[0]) + G4String(" MeV");
+      UImanager->ApplyCommand("/gps/ene/mono " + beamEnergy);
       auto runOutputFileCmd = "/run/file/output ./output/lynx.root";
       UImanager->ApplyCommand(runOutputFileCmd);
       for (int layerID = 0; layerID < 6; layerID++)
@@ -238,33 +240,30 @@ int main(int argc, char **argv)
         }
         else
         {
-          for (int sigma_i = 0; sigma_i < 100; sigma_i++)
+          for (int sigma_i = 0; sigma_i < 10; sigma_i++)
           {
-            auto sigma = std::to_string(2. + (2./100.)*sigma_i) + G4String(" mm");
+            auto sigma = std::to_string(3. + (1./10.)*sigma_i) + G4String(" mm");
             UImanager->ApplyCommand("/gps/pos/sigma_r " + sigma);
             UImanager->ApplyCommand("/run/lynx/beam/sigma_r " + sigma);
-            for (int sigma_ai = 0; sigma_ai < 100; sigma_ai++)
+            for (int sigma_ai = 0; sigma_ai < 10; sigma_ai++)
             {
-              auto angleSigma = std::to_string(0.0001 + (0.1 - 0.0001)*sigma_ai/100) +
+              auto angleSigma = std::to_string(0.001 + (0.01 - 0.001)*sigma_ai/10) +
                 G4String(" deg");
               UImanager->ApplyCommand("/gps/ang/sigma_r " + angleSigma);
               UImanager->ApplyCommand("/run/lynx/beam/sigma_a " + angleSigma);
-              for (int sigma_ei = 0; sigma_ei < 100; sigma_ei++)
-              {
-                auto energySigma = std::to_string(sigma_ei/100.) + G4String(" MeV");
-                UImanager->ApplyCommand("/gps/ene/sigma " + energySigma);
-                UImanager->ApplyCommand("/run/lynx/beam/sigma_e " + energySigma);
-                
-                auto beamRunCmd = "/run/beamOn " + numOfBeam;
-                UImanager->ApplyCommand(beamRunCmd);
+              // auto energySigma = std::to_string(sigma_ei/100.) + G4String(" MeV");
+              UImanager->ApplyCommand("/gps/ene/sigma 0.1 MeV");
+              UImanager->ApplyCommand("/run/lynx/beam/sigma_e 0.1 MeV");
+              
+              auto beamRunCmd = "/run/beamOn " + numOfBeam;
+              UImanager->ApplyCommand(beamRunCmd);
 
-                G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
-                G4cout << "Sigma step: " << sigma_i << ", Sigma angle step: " << sigma_ai <<
-                  ", Sigma energy step: " << sigma_ei << G4endl;
-                G4cout << "Sigma: " << sigma << ", Sigma angle: " << angleSigma <<
-                  ", Sigma energy: " << energySigma << G4endl;
-                G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
-              }
+              G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
+              G4cout << "Sigma step: " << sigma_i << ", Sigma angle step: " << sigma_ai <<
+                ", Sigma energy step: " << "0" << G4endl;
+              G4cout << "Sigma: " << sigma << ", Sigma angle: " << angleSigma <<
+                ", Sigma energy: " << "0.1 MeV" << G4endl;
+              G4cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << G4endl;
             }
           }
         }
