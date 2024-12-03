@@ -10,7 +10,6 @@
 #include "argparse.hh"
 #include "utils.hh"
 #include "CLHEP/Random/Random.h"
-
 #include <iostream>
 #include <filesystem>
 
@@ -93,6 +92,9 @@ int main(int argc, char **argv)
   auto rotationArray = program.get<std::vector<float>>("--rotate");
   auto beamTransArray = program.get<std::vector<float>>("--translate");
   auto condorID = program.get<std::vector<int>>("--condorid");
+
+  CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
+  CLHEP::HepRandom::setTheSeed(condorID[0]);
 
   G4UIExecutive* ui = nullptr;
   if (!simMode.compare("pct") && !macroFile.compare("init_vis.mac")) 

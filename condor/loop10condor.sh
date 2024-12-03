@@ -1,3 +1,3 @@
-for i in {1..100}; do
+for i in {1..10}; do
     condor_submit submit.condor
 done
